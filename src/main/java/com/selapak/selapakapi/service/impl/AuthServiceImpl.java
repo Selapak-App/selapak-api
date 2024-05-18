@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.selapak.selapakapi.constant.ERole;
+import com.selapak.selapakapi.exception.UserCredentialNotFoundException;
 import com.selapak.selapakapi.model.entity.Admin;
 import com.selapak.selapakapi.model.entity.AppUser;
 import com.selapak.selapakapi.model.entity.Customer;
@@ -107,8 +108,10 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
+    
+
     @Override
-    public LoginResponse login(LoginRequest request) {
+    public LoginResponse loginAdmin(LoginRequest request) {
         Authentication authentication = authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(
                 request.getEmail().toLowerCase(),
@@ -120,11 +123,44 @@ public class AuthServiceImpl implements AuthService {
         AppUser appUser = (AppUser) authentication.getPrincipal();
         String token = jwtUtil.generateToken(appUser);
 
+        UserCredential userCredential = getById(appUser.getId());
+        Admin admin = adminService.getById(userCredential.getAdmin().getId());
+
         return LoginResponse.builder()
+                .id(admin.getId())
                 .email(appUser.getEmail())
                 .role(appUser.getRole())
                 .token(token)
                 .build();
+    }
+
+    @Override
+    public LoginResponse loginCustomer(LoginRequest request) {
+        Authentication authentication = authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(
+                request.getEmail().toLowerCase(),
+                request.getPassword()
+            )
+        );
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        AppUser appUser = (AppUser) authentication.getPrincipal();
+        String token = jwtUtil.generateToken(appUser);
+
+        UserCredential userCredential = getById(appUser.getId());
+        Customer customer = customerService.getById(userCredential.getCustomer().getId());
+
+        return LoginResponse.builder()
+                .id(customer.getId())
+                .email(appUser.getEmail())
+                .role(appUser.getRole())
+                .token(token)
+                .build();
+    }
+
+    @Override
+    public UserCredential getById(String id) {
+        return userCredentialRepository.findById(id).orElseThrow(() -> new UserCredentialNotFoundException());
     }
 
 }
