@@ -41,7 +41,7 @@ public class Customer {
 
     private String address;
 
-    @Column(name = "NIK", unique = true)
+    @Column(unique = true)
     private String nik;
 
     private Boolean isActive;
