@@ -4,6 +4,7 @@ public class AppPath {
     
     public final static String ADMIN_PATH = "/admin";
     public final static String CUSTOMER_PATH = "/customers";
+    public final static String RENT_PERIOD_PATH = "/rent-periods";
 
     public final static String REGISTER_PATH = "/register";
     public final static String LOGIN_PATH = "/login";
