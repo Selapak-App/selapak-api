@@ -11,5 +11,10 @@ public class DbTableSchema {
     public final static String LAND_OWNER_SCHEMA = "m_land_owner";
     public final static String LAND_PRICE_SCHEMA = "m_land_price";
     public final static String BUSINESS_TYPE_SCHEMA = "m_business_type";
+    public final static String LAND_SCHEMA = "m_land";
+    public final static String BUSINESS_SCHEMA = "m_business";
+    public final static String BUSINESS_RECOMENDATION_SCHEMA = "t_business_type_recomendation";
+    public final static String LAND_PHOTO_SCHEMA = "m_land_photo";
+    public final static String TRANSACTION_SCHEMA = "t_transaction";
     
 }

@@ -1,18 +1,16 @@
 package com.selapak.selapakapi.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.selapak.selapakapi.constant.DbTableSchema;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.List;
 
 @Entity
 @Table(name = DbTableSchema.RENT_PERIOD_SCHEMA)
@@ -29,5 +27,7 @@ public class RentPeriod {
 
     @Column(unique = true)
     private Integer period;
-
+    @OneToMany(mappedBy = "rentPeriod")
+    @JsonBackReference
+    private List<Transaction> transactionList;
 }
