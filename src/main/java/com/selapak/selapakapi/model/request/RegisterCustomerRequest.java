@@ -3,7 +3,6 @@ package com.selapak.selapakapi.model.request;
 import com.selapak.selapakapi.constant.Gender;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
