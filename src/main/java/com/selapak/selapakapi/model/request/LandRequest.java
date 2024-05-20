@@ -24,5 +24,5 @@ public class LandRequest {
     private Integer totalSlot;
     private Boolean isActive;
     private Long price;
-    private List<BusinessType> businessTypes;
+    private List<BusinessTypeRequest> businessTypes;
 }

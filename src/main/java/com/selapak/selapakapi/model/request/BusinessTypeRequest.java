@@ -11,8 +11,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder(toBuilder = true)
 public class BusinessTypeRequest {
+    private String businessTypeId;
 
-    @NotBlank(message = "Name is required.")
     private String name;
     
 }

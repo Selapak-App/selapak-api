@@ -8,6 +8,7 @@ import com.selapak.selapakapi.service.BusinessTypeService;
 import com.selapak.selapakapi.service.LandOwnerService;
 import com.selapak.selapakapi.service.LandPriceService;
 import com.selapak.selapakapi.service.LandService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +23,7 @@ public class LandServiceImpl implements LandService {
     private final LandPriceService landPriceService;
     private final BusinessTypeService businessTypeService;
     @Override
+    @Transactional(rollbackOn = Exception.class)
     public LandResponse create(LandRequest landRequest) {
         LandOwner landOwner = landOwnerService.getById(landRequest.getLandOwnerId());
 
@@ -47,7 +49,7 @@ public class LandServiceImpl implements LandService {
 
         List<BusinessType> businessTypes = landRequest.getBusinessTypes().stream()
                 .map(businessTypesRequest -> {
-                            BusinessType businessType = businessTypeService.getById(businessTypesRequest.getId());
+                            BusinessType businessType = businessTypeService.getById(businessTypesRequest.getBusinessTypeId());
                             return businessType;
                         }
                 ).toList();
@@ -63,7 +65,7 @@ public class LandServiceImpl implements LandService {
         land.setBusinessRecomendations(businessTypesRecomendation);
         land.setLandPriceList(List.of(landPrice));
 
-        landRepository.save(land);
+        landRepository.saveAndFlush(land);
 
         return LandResponse.builder()
                 .landOwnerId(landOwner.getId())
@@ -77,6 +79,7 @@ public class LandServiceImpl implements LandService {
                 .totalSlot(land.getTotalSlot())
                 .slotArea(land.getSlotArea())
                 .businessTypes(businessTypes)
+                .isActive(land.getIsActive())
                 .build();
     }
 }

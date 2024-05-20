@@ -19,7 +19,7 @@ public class LandPriceServiceImpl implements LandPriceService {
 
     @Override
     public LandPrice create(LandPrice landPrice) {
-        return landPriceRepository.saveAndFlush(landPrice);
+        return landPriceRepository.save(landPrice);
     }
 
     @Override
