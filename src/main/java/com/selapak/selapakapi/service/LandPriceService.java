@@ -1,8 +1,11 @@
 package com.selapak.selapakapi.service;
 
+import com.selapak.selapakapi.model.entity.Land;
 import com.selapak.selapakapi.model.entity.LandPrice;
 import com.selapak.selapakapi.model.request.LandPriceRequest;
 import com.selapak.selapakapi.model.request.LandPriceUpdateRequest;
+
+import java.util.List;
 
 public interface LandPriceService {
     
@@ -12,6 +15,8 @@ public interface LandPriceService {
 
     LandPrice createWithDto(LandPriceRequest request);
 
-    LandPrice updateById(String id, LandPriceUpdateRequest request);
+    LandPrice updateById(LandPriceUpdateRequest request);
+
+    List<LandPrice> getAll();
 
 }

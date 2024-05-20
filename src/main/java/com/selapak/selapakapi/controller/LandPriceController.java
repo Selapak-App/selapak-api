@@ -20,6 +20,8 @@ import com.selapak.selapakapi.service.LandPriceService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(AppPath.LAND_PRICE_PATH)
@@ -51,12 +53,24 @@ public class LandPriceController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PutMapping(AppPath.UPDATE_BY_ID)
-    public ResponseEntity<?> updateLandPriceById(@PathVariable String id, @Valid @RequestBody LandPriceUpdateRequest request) {
-        LandPrice landPrice = landPriceService.updateById(id, request);
+    @PutMapping
+    public ResponseEntity<?> updateLandPriceById(@Valid @RequestBody LandPriceUpdateRequest request) {
+        LandPrice landPrice = landPriceService.updateById(request);
         CommonResponse<LandPrice> response = CommonResponse.<LandPrice>builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("Update land price successfully.")
+                .data(landPrice)
+                .build();
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<?> getAllLend() {
+        List<LandPrice> landPrice = landPriceService.getAll();
+        CommonResponse<List<LandPrice>> response = CommonResponse.<List<LandPrice>>builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("Get land price successfully.")
                 .data(landPrice)
                 .build();
 

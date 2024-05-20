@@ -11,6 +11,8 @@ import com.selapak.selapakapi.service.LandPriceService;
 
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class LandPriceServiceImpl implements LandPriceService {
@@ -38,14 +40,14 @@ public class LandPriceServiceImpl implements LandPriceService {
     }
 
     @Override
-    public LandPrice updateById(String id, LandPriceUpdateRequest request) {
-        LandPrice existingLandPrice = getById(id);
+    public LandPrice updateById(LandPriceUpdateRequest request) {
+        LandPrice existingLandPrice = getById(request.getLandId());
         existingLandPrice = existingLandPrice.toBuilder()
                 .isActive(false)
                 .build();
         landPriceRepository.saveAndFlush(existingLandPrice);
 
-        LandPrice newLandPrice = existingLandPrice.toBuilder()
+        LandPrice newLandPrice = LandPrice.builder()
                 .price(request.getPrice())
                 .isActive(true)
                 .build();
@@ -53,4 +55,8 @@ public class LandPriceServiceImpl implements LandPriceService {
         return landPriceRepository.save(newLandPrice);
     }
 
+    @Override
+    public List<LandPrice> getAll() {
+        return landPriceRepository.findAll();
+    }
 }
