@@ -18,6 +18,7 @@ public class CustomerResponse {
     private String phoneNumber;
     private String email;
     private String address;
+    private String gender;
     private String nik;
     private Boolean isActive;
     private LocalDateTime updatedAt;

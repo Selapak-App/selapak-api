@@ -92,6 +92,7 @@ public class AuthServiceImpl implements AuthService {
             Customer customer = Customer.builder()
                     .fullName(request.getFullName())
                     .email(request.getEmail())
+                    .gender(request.getGender())
                     .isActive(true)
                     .createdAt(LocalDateTime.now())
                     .updatedAt(LocalDateTime.now())

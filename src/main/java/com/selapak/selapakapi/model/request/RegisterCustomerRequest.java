@@ -1,6 +1,9 @@
 package com.selapak.selapakapi.model.request;
 
+import com.selapak.selapakapi.constant.Gender;
+
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,6 +20,9 @@ public class RegisterCustomerRequest {
 
     @NotBlank(message = "Email is required.")
     private String email;
+
+    // @NotBlank(message = "Gender is required.")
+    private Gender gender;
 
     private String password;
     
