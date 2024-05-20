@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.selapak.selapakapi.constant.DbTableSchema;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Cascade;
 
 import java.util.List;
 
@@ -33,7 +34,7 @@ public class Land {
     @OneToMany(mappedBy = "land")
     @JsonBackReference
     private List<LandPrice> landPriceList;
-    @OneToMany(mappedBy = "land")
+    @OneToMany(mappedBy = "land", cascade = CascadeType.ALL)
     @JsonBackReference
     private List<BusinessRecomendation> businessRecomendations;
     @OneToMany(mappedBy = "land")
