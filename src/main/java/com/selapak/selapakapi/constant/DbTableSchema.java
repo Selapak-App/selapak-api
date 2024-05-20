@@ -10,5 +10,6 @@ public class DbTableSchema {
     public final static String RENT_PERIOD_SCHEMA = "m_rent_period";
     public final static String LAND_OWNER_SCHEMA = "m_land_owner";
     public final static String LAND_PRICE_SCHEMA = "m_land_price";
+    public final static String BUSINESS_TYPE_SCHEMA = "m_business_type";
     
 }
