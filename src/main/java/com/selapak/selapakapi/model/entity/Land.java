@@ -31,7 +31,7 @@ public class Land {
     @ManyToOne
     @JoinColumn(name = "land_owner_id")
     private LandOwner landOwner;
-    @OneToMany(mappedBy = "land")
+    @OneToMany(mappedBy = "land",  cascade = CascadeType.ALL)
     @JsonBackReference
     private List<LandPrice> landPriceList;
     @OneToMany(mappedBy = "land", cascade = CascadeType.ALL)
