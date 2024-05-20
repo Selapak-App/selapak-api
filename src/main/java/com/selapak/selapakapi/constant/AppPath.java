@@ -7,6 +7,8 @@ public class AppPath {
     public final static String RENT_PERIOD_PATH = "/rent-periods";
     public final static String LAND_OWNER_PATH = "/land-owners";
     public final static String LAND_PRICE_PATH = "/land-prices";
+    public final static String BUSINESS_TYPE_PATH = "/business-types";
+    public final static String LAND_PATH = "/land";
 
     public final static String REGISTER_PATH = "/register";
     public final static String LOGIN_PATH = "/login";
