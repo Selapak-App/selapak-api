@@ -5,6 +5,8 @@ import java.time.Instant;
 import org.springframework.stereotype.Service;
 
 import com.selapak.selapakapi.constant.Payment;
+import com.selapak.selapakapi.constant.SurveyStatus;
+import com.selapak.selapakapi.constant.TrxStatus;
 import com.selapak.selapakapi.constant.Verify;
 import com.selapak.selapakapi.model.entity.Business;
 import com.selapak.selapakapi.model.entity.BusinessType;
@@ -60,9 +62,11 @@ public class TransactionServiceImpl implements TransactionService {
                 .updatedAt(Instant.now().toEpochMilli())
                 .isActive(true)
                 .quantity(request.getQuantity())
-                .surveyStatus(false)
+                .isSurveyed(false)
+                .surveyStatus(SurveyStatus.PENDING)
                 .verifyStatus(Verify.PENDING)
                 .paymentStatus(Payment.UNPAID)
+                .transactionStatus(TrxStatus.PENDING)
                 .customer(customer)
                 .rentPeriod(rentPeriod)
                 .landPrice(landPrice)
@@ -76,13 +80,20 @@ public class TransactionServiceImpl implements TransactionService {
         return convertToTransactionResponse(transaction);
     }
 
+    @Override
+    public TransactionResponse getById(String id) {
+        return null;
+    }
+
     private TransactionResponse convertToTransactionResponse(Transaction transaction) {
         return TransactionResponse.builder()
                 .id(transaction.getId())
                 .quantity(transaction.getQuantity())
-                .surveyStatus(transaction.getSurveyStatus())
                 .verifyStatus(transaction.getVerifyStatus().toString())
+                .isSurveyed(transaction.getIsSurveyed())
+                .surveyStatus(transaction.getSurveyStatus().toString())
                 .paymentStatus(transaction.getPaymentStatus().toString())
+                .transactionStatus(transaction.getTransactionStatus().toString())
                 .customer(transaction.getCustomer().getFullName())
                 .rentPeriod(transaction.getRentPeriod().getPeriod())
                 .landAddress(transaction.getLandPrice().getLand().getAddress())

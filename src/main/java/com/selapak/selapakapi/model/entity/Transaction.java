@@ -2,6 +2,8 @@ package com.selapak.selapakapi.model.entity;
 
 import com.selapak.selapakapi.constant.DbTableSchema;
 import com.selapak.selapakapi.constant.Payment;
+import com.selapak.selapakapi.constant.SurveyStatus;
+import com.selapak.selapakapi.constant.TrxStatus;
 import com.selapak.selapakapi.constant.Verify;
 import jakarta.persistence.*;
 import lombok.*;
@@ -25,13 +27,19 @@ public class Transaction {
     @Column(name = "qty")
     private Integer quantity;
 
-    private Boolean surveyStatus;
-    
     @Enumerated(EnumType.STRING)
     private Verify verifyStatus;
     
+    private Boolean isSurveyed;
+    
+    @Enumerated(EnumType.STRING)
+    private SurveyStatus surveyStatus;
+
     @Enumerated(EnumType.STRING)
     private Payment paymentStatus;
+
+    @Enumerated(EnumType.STRING)
+    private TrxStatus transactionStatus;
     
     @ManyToOne
     @JoinColumn(name = "verified_by")
