@@ -10,6 +10,7 @@ public class AppPath {
     public final static String LAND_PRICE_PATH = "/land-prices";
     public final static String BUSINESS_TYPE_PATH = "/business-types";
     public final static String LAND_PATH = "/lands";
+    public final static String TRANSACTION_PATH = "/transactions";
 
     public final static String REGISTER_PATH = "/register";
     public final static String LOGIN_PATH = "/login";

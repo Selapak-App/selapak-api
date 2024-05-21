@@ -14,31 +14,41 @@ import lombok.*;
 @Setter
 @Builder(toBuilder = true)
 public class Transaction {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
     private Long createdAt;
     private Long updatedAt;
     private Boolean isActive;
+    
     @Column(name = "qty")
-    private Long quantity;
+    private Integer quantity;
+
     private Boolean surveyStatus;
+    
     @Enumerated(EnumType.STRING)
     private Verify verifyStatus;
+    
     @Enumerated(EnumType.STRING)
     private Payment paymentStatus;
+    
     @ManyToOne
     @JoinColumn(name = "verified_by")
-    private Admin admin;
+    private Admin verifiedBy;
+    
     @ManyToOne
     @JoinColumn(name = "customer_id")
     private Customer customer;
+    
     @ManyToOne
     @JoinColumn(name = "rent_period_id")
     private RentPeriod rentPeriod;
+    
     @ManyToOne
     @JoinColumn(name = "price_id")
     private LandPrice landPrice;
+    
     @OneToOne
     private Business business;
 }
