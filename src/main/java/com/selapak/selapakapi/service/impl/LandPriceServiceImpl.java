@@ -49,6 +49,7 @@ public class LandPriceServiceImpl implements LandPriceService {
 
         LandPrice newLandPrice = LandPrice.builder()
                 .price(request.getPrice())
+                .land(existingLandPrice.getLand())
                 .isActive(true)
                 .build();
 

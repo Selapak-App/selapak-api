@@ -37,10 +37,8 @@ public class LandServiceImpl implements LandService {
     @Override
     @Transactional(rollbackOn = Exception.class)
     public LandResponse create(LandRequest landRequest) {
-        // Mendapatkan LandOwner dari service
         LandOwner landOwner = landOwnerService.getById(landRequest.getLandOwnerId());
 
-        // Membangun entitas Land
         Land land = Land.builder()
                 .landOwner(landOwner)
                 .address(landRequest.getAddress())
@@ -54,25 +52,20 @@ public class LandServiceImpl implements LandService {
                 .isActive(true)
                 .build();
 
-        // Menyimpan entitas Land
         landRepository.saveAndFlush(land);
 
-        // Membangun entitas LandPrice
         LandPrice landPrice = LandPrice.builder()
                 .price(landRequest.getPrice())
                 .land(land)
                 .isActive(true)
                 .build();
 
-        // Menyimpan entitas LandPrice
         landPriceService.create(landPrice);
 
-        // Mendapatkan BusinessType dari request
         List<BusinessType> businessTypes = landRequest.getBusinessTypes().stream()
                 .map(businessTypesRequest -> businessTypeService.getById(businessTypesRequest.getBusinessTypeId()))
                 .toList();
 
-        // Membangun BusinessRecomendation
         List<BusinessRecomendation> businessTypesRecomendation = businessTypes.stream()
                 .map(businessType -> BusinessRecomendation.builder()
                         .businessType(businessType)
@@ -80,14 +73,11 @@ public class LandServiceImpl implements LandService {
                         .build())
                 .collect(Collectors.toList());
 
-        // Menyimpan rekomendasi bisnis ke dalam entitas Land
         land.setBusinessRecomendations(businessTypesRecomendation);
         land.setLandPrice(landPrice);
 
-        // Menyimpan kembali entitas Land setelah menambahkan relasi
         landRepository.saveAndFlush(land);
 
-        // Mengembalikan response
         return convertToLandResponse(land);
     }
 
@@ -126,10 +116,11 @@ public class LandServiceImpl implements LandService {
         landRepository.saveAndFlush(existingLand);
 
         LandPriceUpdateRequest landPrice = LandPriceUpdateRequest.builder()
+                .landId(existingLand.getLandPrice().getId())
                 .price(request.getPrice())
                 .build();
         
-        landPriceService.updateById(existingLand.getLandPrice().getId(), landPrice);
+        landPriceService.updateById(landPrice);
 
         return convertToLandResponse(existingLand);
     }

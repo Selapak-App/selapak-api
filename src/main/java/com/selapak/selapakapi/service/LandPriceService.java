@@ -1,6 +1,5 @@
 package com.selapak.selapakapi.service;
 
-import com.selapak.selapakapi.model.entity.Land;
 import com.selapak.selapakapi.model.entity.LandPrice;
 import com.selapak.selapakapi.model.request.LandPriceRequest;
 import com.selapak.selapakapi.model.request.LandPriceUpdateRequest;
