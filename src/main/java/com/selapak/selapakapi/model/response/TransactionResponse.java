@@ -13,9 +13,11 @@ public class TransactionResponse {
 
     private String id;
     private Integer quantity;
-    private Boolean surveyStatus;
     private String verifyStatus;
+    private Boolean isSurveyed;
+    private String surveyStatus;
     private String paymentStatus;
+    private String transactionStatus;
     private String verifyBy;
     private String customer;
     private Integer rentPeriod;
