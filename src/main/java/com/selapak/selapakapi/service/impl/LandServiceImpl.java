@@ -96,6 +96,7 @@ public class LandServiceImpl implements LandService {
     }
 
     @Override
+    @Transactional(rollbackOn = Exception.class)
     public LandResponse updateById(String id, LandRequest request) {
         Land existingLand = getById(id);
 
@@ -113,14 +114,38 @@ public class LandServiceImpl implements LandService {
                 .totalSlot(request.getTotalSlot())
                 .isActive(true)
                 .build();
+
         landRepository.saveAndFlush(existingLand);
 
-        LandPriceUpdateRequest landPrice = LandPriceUpdateRequest.builder()
-                .landId(existingLand.getLandPrice().getId())
-                .price(request.getPrice())
-                .build();
-        
-        landPriceService.updateById(landPrice);
+        // LandPriceUpdateRequest landPriceUpdateRequest = LandPriceUpdateRequest.builder()
+        //         .landId(existingLand.getId())
+        //         .price(request.getPrice())
+        //         .land(existingLand)
+        //         .build();
+
+        // LandPrice newLandPrice = landPriceService.updateById(landPriceUpdateRequest);
+
+        // existingLand.setLandPrice(newLandPrice);
+        // landRepository.saveAndFlush(existingLand);
+
+        if (request.getPrice() != null) {
+            landPriceService.deleteById(existingLand.getLandPrice().getId());
+            
+            LandPrice landPrice = LandPrice.builder()
+                    .price(request.getPrice())
+                    .land(existingLand)
+                    .isActive(true)
+                    .build();
+            
+            landPrice = landPriceService.create(landPrice);
+
+            existingLand.setLandPrice(landPrice);
+            landRepository.saveAndFlush(existingLand);
+        } else {
+            LandPrice landPrice = landPriceService.getById(existingLand.getLandPrice().getId());
+            existingLand.setLandPrice(landPrice);
+            landRepository.saveAndFlush(existingLand);
+        }
 
         return convertToLandResponse(existingLand);
     }
@@ -129,6 +154,13 @@ public class LandServiceImpl implements LandService {
     public void deleteById(String id) {
         Land land = getById(id);
         land.setIsActive(false);
+        landRepository.saveAndFlush(land);
+    }
+
+    @Override
+    public void decreaseLandSlotAvailable(String id, Integer quantity) {
+        Land land = getById(id);
+        land.setSlotAvailable(land.getSlotAvailable() - quantity);
         landRepository.saveAndFlush(land);
     }
 
@@ -141,12 +173,13 @@ public class LandServiceImpl implements LandService {
                 .village(land.getVillage())
                 .postalCode(land.getPostalCode())
                 .description(land.getDescription())
-                .price(land.getLandPrice().getPrice())
+                .landPrice(land.getLandPrice())
                 .slotAvailable(land.getSlotAvailable())
                 .totalSlot(land.getTotalSlot())
                 .slotArea(land.getSlotArea())
                 .isActive(land.getIsActive())
-                .businessTypes(land.getBusinessRecomendations().stream().map(BusinessRecomendation::getBusinessType).toList())
+                .businessTypes(
+                        land.getBusinessRecomendations().stream().map(BusinessRecomendation::getBusinessType).toList())
                 .build();
 
         return landResponse;

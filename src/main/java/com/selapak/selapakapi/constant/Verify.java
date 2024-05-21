@@ -1,5 +1,5 @@
 package com.selapak.selapakapi.constant;
 
 public enum Verify {
-    ACCEPTED, REJECTED
+    ACCEPTED, REJECTED, PENDING
 }

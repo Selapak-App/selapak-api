@@ -15,6 +15,7 @@ import com.selapak.selapakapi.model.entity.LandPrice;
 import com.selapak.selapakapi.model.request.LandPriceRequest;
 import com.selapak.selapakapi.model.request.LandPriceUpdateRequest;
 import com.selapak.selapakapi.model.response.CommonResponse;
+import com.selapak.selapakapi.model.response.LandPriceResponse;
 import com.selapak.selapakapi.service.LandPriceService;
 
 import jakarta.validation.Valid;
@@ -67,8 +68,8 @@ public class LandPriceController {
 
     @GetMapping
     public ResponseEntity<?> getAllLend() {
-        List<LandPrice> landPrice = landPriceService.getAll();
-        CommonResponse<List<LandPrice>> response = CommonResponse.<List<LandPrice>>builder()
+        List<LandPriceResponse> landPrice = landPriceService.getAll();
+        CommonResponse<List<LandPriceResponse>> response = CommonResponse.<List<LandPriceResponse>>builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("Get land price successfully.")
                 .data(landPrice)

@@ -6,12 +6,14 @@ import com.selapak.selapakapi.exception.LandPriceNotFoundException;
 import com.selapak.selapakapi.model.entity.LandPrice;
 import com.selapak.selapakapi.model.request.LandPriceRequest;
 import com.selapak.selapakapi.model.request.LandPriceUpdateRequest;
+import com.selapak.selapakapi.model.response.LandPriceResponse;
 import com.selapak.selapakapi.repository.LandPriceRepository;
 import com.selapak.selapakapi.service.LandPriceService;
 
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -35,29 +37,55 @@ public class LandPriceServiceImpl implements LandPriceService {
                 .price(request.getPrice())
                 .isActive(true)
                 .build();
-                
+
         return landPriceRepository.save(landPrice);
     }
 
     @Override
     public LandPrice updateById(LandPriceUpdateRequest request) {
-        LandPrice existingLandPrice = getById(request.getLandId());
-        existingLandPrice = existingLandPrice.toBuilder()
-                .isActive(false)
-                .build();
-        landPriceRepository.saveAndFlush(existingLandPrice);
+        // Try to retrieve existing LandPrice entity
+        LandPrice existingLandPrice = landPriceRepository.findById(request.getLandId()).orElse(null);
 
+        // If existing LandPrice is found, deactivate it
+        if (existingLandPrice != null) {
+            existingLandPrice = existingLandPrice.toBuilder()
+                    .isActive(false)
+                    .build();
+            landPriceRepository.saveAndFlush(existingLandPrice);
+        }
+
+        // Create a new LandPrice entity with updated information
         LandPrice newLandPrice = LandPrice.builder()
                 .price(request.getPrice())
-                .land(existingLandPrice.getLand())
+                .land(request.getLand())
                 .isActive(true)
                 .build();
 
+        // Save and return the new LandPrice entity
         return landPriceRepository.save(newLandPrice);
     }
 
     @Override
-    public List<LandPrice> getAll() {
-        return landPriceRepository.findAll();
+    public List<LandPriceResponse> getAll() {
+        List<LandPrice> landPrices = landPriceRepository.findAll();
+        return landPrices.stream()
+                .map(this::convertToLandPriceResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public void deleteById(String id) {
+        LandPrice landPrice = getById(id);
+        landPrice.setIsActive(false);
+        landPriceRepository.saveAndFlush(landPrice);
+    }
+
+    private LandPriceResponse convertToLandPriceResponse(LandPrice landPrice) {
+        return LandPriceResponse.builder()
+                .id(landPrice.getId())
+                .price(landPrice.getPrice())
+                .land(landPrice.getLand())
+                .isActive(landPrice.getIsActive())
+                .build();
     }
 }

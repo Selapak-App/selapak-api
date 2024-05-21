@@ -3,6 +3,7 @@ package com.selapak.selapakapi.service;
 import com.selapak.selapakapi.model.entity.LandPrice;
 import com.selapak.selapakapi.model.request.LandPriceRequest;
 import com.selapak.selapakapi.model.request.LandPriceUpdateRequest;
+import com.selapak.selapakapi.model.response.LandPriceResponse;
 
 import java.util.List;
 
@@ -16,6 +17,8 @@ public interface LandPriceService {
 
     LandPrice updateById(LandPriceUpdateRequest request);
 
-    List<LandPrice> getAll();
+    List<LandPriceResponse> getAll();
+
+    void deleteById(String id);
 
 }

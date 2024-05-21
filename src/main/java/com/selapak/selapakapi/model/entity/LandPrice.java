@@ -29,7 +29,7 @@ public class LandPrice {
 
     private Boolean isActive;
 
-    @OneToOne
+    @OneToMany
     @JoinColumn(name = "land_id", referencedColumnName = "id")
     @JsonBackReference
     private Land land;

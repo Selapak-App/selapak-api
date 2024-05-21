@@ -26,8 +26,9 @@ public class Business {
     @ManyToOne
     @JoinColumn(name = "type_id")
     private BusinessType businessType;
-    
+
     @ManyToOne
     @JoinColumn(name = "owner_id")
     private Customer customer;
+    
 }

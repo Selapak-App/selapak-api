@@ -36,7 +36,4 @@ public class Admin {
     @JoinColumn(name = "user_credential_id", referencedColumnName = "id")
     private UserCredential userCredential;
 
-    @OneToMany(mappedBy = "admin")
-    @JsonBackReference
-    private List<Transaction> transactionList;
 }
