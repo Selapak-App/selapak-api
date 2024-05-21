@@ -13,6 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @Builder(toBuilder = true)
 public class LandResponse {
+    private String id;
     private String landOwnerId;
     private String address;
     private String district;
