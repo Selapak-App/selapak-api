@@ -13,6 +13,8 @@ public interface LandPriceService {
 
     LandPrice create(LandPrice landPrice);
 
+    LandPrice update(LandPrice landPrice);
+
     LandPrice createWithDto(LandPriceRequest request);
 
     LandPrice updateById(LandPriceUpdateRequest request);

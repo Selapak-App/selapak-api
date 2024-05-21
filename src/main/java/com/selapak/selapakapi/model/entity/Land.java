@@ -5,6 +5,7 @@ import com.selapak.selapakapi.constant.DbTableSchema;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -34,10 +35,9 @@ public class Land {
     @JoinColumn(name = "land_owner_id")
     private LandOwner landOwner;
 
-    @OneToOne
-    @JoinColumn(name = "land_price_id", referencedColumnName = "id")
+    @OneToMany(mappedBy = "land", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonBackReference
-    private LandPrice landPrice;
+    private List<LandPrice> landPrices;
 
     @OneToMany(mappedBy = "land", cascade = CascadeType.ALL)
     @JsonBackReference

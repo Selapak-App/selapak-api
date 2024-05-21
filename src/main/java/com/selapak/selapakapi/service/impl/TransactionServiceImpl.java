@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 
 import com.selapak.selapakapi.constant.Payment;
 import com.selapak.selapakapi.constant.Verify;
-import com.selapak.selapakapi.model.entity.Admin;
 import com.selapak.selapakapi.model.entity.Business;
 import com.selapak.selapakapi.model.entity.BusinessType;
 import com.selapak.selapakapi.model.entity.Customer;
@@ -16,7 +15,6 @@ import com.selapak.selapakapi.model.entity.Transaction;
 import com.selapak.selapakapi.model.request.TransactionRequest;
 import com.selapak.selapakapi.model.response.TransactionResponse;
 import com.selapak.selapakapi.repository.TransactionRepository;
-import com.selapak.selapakapi.service.AdminService;
 import com.selapak.selapakapi.service.BusinessService;
 import com.selapak.selapakapi.service.BusinessTypeService;
 import com.selapak.selapakapi.service.CustomerService;
@@ -33,7 +31,6 @@ import lombok.RequiredArgsConstructor;
 public class TransactionServiceImpl implements TransactionService {
 
     private final TransactionRepository transactionRepository;
-    private final AdminService adminService;
     private final CustomerService customerService;
     private final RentPeriodService rentPeriodService;
     private final LandPriceService landPriceService;
@@ -44,7 +41,6 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     @Transactional(rollbackOn = Exception.class)
     public TransactionResponse create(TransactionRequest request) {
-        Admin admin = adminService.getById(request.getAdminId());
         Customer customer = customerService.getById(request.getCustomerId());
         RentPeriod rentPeriod = rentPeriodService.getById(request.getRentPeriodId());
         LandPrice landPrice = landPriceService.getById(request.getLandPriceId());
@@ -67,7 +63,6 @@ public class TransactionServiceImpl implements TransactionService {
                 .surveyStatus(false)
                 .verifyStatus(Verify.PENDING)
                 .paymentStatus(Payment.UNPAID)
-                .verifiedBy(admin)
                 .customer(customer)
                 .rentPeriod(rentPeriod)
                 .landPrice(landPrice)
@@ -88,7 +83,6 @@ public class TransactionServiceImpl implements TransactionService {
                 .surveyStatus(transaction.getSurveyStatus())
                 .verifyStatus(transaction.getVerifyStatus().toString())
                 .paymentStatus(transaction.getPaymentStatus().toString())
-                .verifyBy(transaction.getVerifiedBy().getName())
                 .customer(transaction.getCustomer().getFullName())
                 .rentPeriod(transaction.getRentPeriod().getPeriod())
                 .landAddress(transaction.getLandPrice().getLand().getAddress())

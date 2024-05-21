@@ -32,6 +32,11 @@ public class LandPriceServiceImpl implements LandPriceService {
     }
 
     @Override
+    public LandPrice update(LandPrice landPrice) {
+        return landPriceRepository.saveAndFlush(landPrice);
+    }
+
+    @Override
     public LandPrice createWithDto(LandPriceRequest request) {
         LandPrice landPrice = LandPrice.builder()
                 .price(request.getPrice())
