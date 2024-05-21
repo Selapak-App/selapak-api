@@ -2,7 +2,7 @@ package com.selapak.selapakapi.service.impl;
 
 import org.springframework.stereotype.Service;
 
-import com.selapak.exception.AdminNotFoundException;
+import com.selapak.selapakapi.exception.AdminNotFoundException;
 import com.selapak.selapakapi.model.entity.Admin;
 import com.selapak.selapakapi.repository.AdminRepository;
 import com.selapak.selapakapi.service.AdminService;

@@ -2,7 +2,6 @@ package com.selapak.selapakapi.model.request;
 
 import com.selapak.selapakapi.constant.Gender;
 
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,17 +11,13 @@ import lombok.NoArgsConstructor;
 @Builder(toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class RegisterCustomerRequest {
+public class CustomerUpdateRequest {
 
-    @NotBlank(message = "Full name is required.")
+    private String id;
     private String fullName;
-
-    @NotBlank(message = "Email is required.")
-    private String email;
-
-    // @NotBlank(message = "Gender is required.")
+    private String phoneNumber;
     private Gender gender;
-
-    private String password;
+    private String address;
+    private String nik;
     
 }

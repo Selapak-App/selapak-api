@@ -13,30 +13,32 @@ import lombok.Setter;
 import java.util.List;
 
 @Entity
-@Table(name = DbTableSchema.ADMIN_SCHEMA)
+@Table(name = DbTableSchema.LAND_OWNER_SCHEMA)
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @Builder(toBuilder = true)
-public class Admin {
-    
+public class LandOwner {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
-
+    
     private String name;
 
     @Column(unique = true)
     private String email;
 
+    @Column(unique = true, length = 15)
+    private String phoneNumber;
+
+    @Column(unique = true)
+    private String nik;
+
     private Boolean isActive;
 
-    @OneToOne
-    @JoinColumn(name = "user_credential_id", referencedColumnName = "id")
-    private UserCredential userCredential;
-
-    @OneToMany(mappedBy = "admin")
+    @OneToMany(mappedBy = "landOwner")
     @JsonBackReference
-    private List<Transaction> transactionList;
+    private List<Land> lands;
 }

@@ -13,30 +13,21 @@ import lombok.Setter;
 import java.util.List;
 
 @Entity
-@Table(name = DbTableSchema.ADMIN_SCHEMA)
+@Table(name = DbTableSchema.RENT_PERIOD_SCHEMA)
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @Builder(toBuilder = true)
-public class Admin {
+public class RentPeriod {
     
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    private String name;
-
     @Column(unique = true)
-    private String email;
-
-    private Boolean isActive;
-
-    @OneToOne
-    @JoinColumn(name = "user_credential_id", referencedColumnName = "id")
-    private UserCredential userCredential;
-
-    @OneToMany(mappedBy = "admin")
+    private Integer period;
+    @OneToMany(mappedBy = "rentPeriod")
     @JsonBackReference
     private List<Transaction> transactionList;
 }

@@ -50,7 +50,7 @@ public class AuthController {
 
     @PostMapping(AppPath.LOGIN_ADMIN_PATH)
     public ResponseEntity<?> loginAdmin(@Valid @RequestBody LoginRequest request) {
-        LoginResponse loginResponse = authService.login(request);
+        LoginResponse loginResponse = authService.loginAdmin(request);
         CommonResponse<LoginResponse> response = CommonResponse.<LoginResponse>builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("Login successfully.")
@@ -62,7 +62,7 @@ public class AuthController {
 
     @PostMapping(AppPath.LOGIN_PATH)
     public ResponseEntity<?> loginCustomer(@Valid @RequestBody LoginRequest request) {
-        LoginResponse loginResponse = authService.login(request);
+        LoginResponse loginResponse = authService.loginCustomer(request);
         CommonResponse<LoginResponse> response = CommonResponse.<LoginResponse>builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("Login successfully.")
