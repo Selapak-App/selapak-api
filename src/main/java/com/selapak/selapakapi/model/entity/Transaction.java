@@ -1,7 +1,6 @@
 package com.selapak.selapakapi.model.entity;
 
 import com.selapak.selapakapi.constant.DbTableSchema;
-import com.selapak.selapakapi.constant.ERole;
 import com.selapak.selapakapi.constant.Payment;
 import com.selapak.selapakapi.constant.Verify;
 import jakarta.persistence.*;
