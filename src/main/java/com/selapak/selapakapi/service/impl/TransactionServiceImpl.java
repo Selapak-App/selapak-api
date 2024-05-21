@@ -2,12 +2,15 @@ package com.selapak.selapakapi.service.impl;
 
 import java.time.Instant;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.selapak.selapakapi.constant.Payment;
 import com.selapak.selapakapi.constant.SurveyStatus;
 import com.selapak.selapakapi.constant.TrxStatus;
 import com.selapak.selapakapi.constant.Verify;
+import com.selapak.selapakapi.exception.TransactionNotFoundException;
 import com.selapak.selapakapi.model.entity.Business;
 import com.selapak.selapakapi.model.entity.BusinessType;
 import com.selapak.selapakapi.model.entity.Customer;
@@ -39,6 +42,11 @@ public class TransactionServiceImpl implements TransactionService {
     private final BusinessTypeService businessTypeService;
     private final BusinessService businessService;
     private final LandService landService;
+
+    @Override
+    public Transaction getById(String id) {
+        return transactionRepository.findById(id).orElseThrow(() -> new TransactionNotFoundException());
+    }
 
     @Override
     @Transactional(rollbackOn = Exception.class)
@@ -81,14 +89,31 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public TransactionResponse getById(String id) {
-        return null;
+    public TransactionResponse getByIdWithDto(String id) {
+        Transaction transaction = getById(id);
+
+        return convertToTransactionResponse(transaction);
+    }
+
+    @Override
+    public Page<TransactionResponse> getAllWithDto(Integer page, Integer size) {
+        Page<Transaction> transactions = transactionRepository.findAll(PageRequest.of(page, size));
+
+        return transactions.map(this::convertToTransactionResponse);
+    }
+
+    @Override
+    public void deleteById(String id) {
+        Transaction transaction = getById(id);
+        transaction.setIsActive(false);
+        transactionRepository.saveAndFlush(transaction);
     }
 
     private TransactionResponse convertToTransactionResponse(Transaction transaction) {
         return TransactionResponse.builder()
                 .id(transaction.getId())
                 .quantity(transaction.getQuantity())
+                .verifyBy(transaction.getVerifiedBy() != null ? transaction.getVerifiedBy().getName() : null)
                 .verifyStatus(transaction.getVerifyStatus().toString())
                 .isSurveyed(transaction.getIsSurveyed())
                 .surveyStatus(transaction.getSurveyStatus().toString())

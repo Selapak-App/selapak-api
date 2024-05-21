@@ -109,8 +109,6 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
-    
-
     @Override
     public LoginResponse loginAdmin(LoginRequest request) {
         Authentication authentication = authenticationManager.authenticate(
