@@ -7,12 +7,15 @@ import com.selapak.selapakapi.model.response.CommonResponseWithPage;
 import com.selapak.selapakapi.model.response.LandResponse;
 import com.selapak.selapakapi.model.response.PagingResponse;
 import com.selapak.selapakapi.service.LandService;
+import com.selapak.selapakapi.service.UploadImageService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,8 +32,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class LandController {
     private final LandService landService;
 
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> createLand(@RequestBody LandRequest request) {
+    @PostMapping
+    public ResponseEntity<?> createLand(@ModelAttribute LandRequest request) {
         LandResponse landResponse = landService.create(request);
         CommonResponse<LandResponse> response = CommonResponse.<LandResponse>builder()
                 .statusCode(HttpStatus.CREATED.value())

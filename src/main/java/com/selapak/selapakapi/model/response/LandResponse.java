@@ -25,6 +25,7 @@ public class LandResponse {
     private Integer slotAvailable;
     private Integer totalSlot;
     private Boolean isActive;
+    private List<LandPhotoResponse> landPhotos;
     private LandPriceWithoutLandResponse landPrice;
     private List<BusinessType> businessTypes;
 }
