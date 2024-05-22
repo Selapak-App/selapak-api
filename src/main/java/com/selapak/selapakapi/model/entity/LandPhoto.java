@@ -23,5 +23,5 @@ public class LandPhoto {
     @JoinColumn(name = "land_id")
     private Land land;
 
-    private boolean isActive;
+    private Boolean isActive;
 }

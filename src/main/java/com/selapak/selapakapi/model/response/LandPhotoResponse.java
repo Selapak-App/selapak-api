@@ -10,5 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder(toBuilder = true)
 public class LandPhotoResponse {
+    private String id;
     private String imageURL;
+    private Boolean isActive;
 }

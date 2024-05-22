@@ -4,13 +4,11 @@ import com.selapak.selapakapi.exception.LandNotFoundException;
 import com.selapak.selapakapi.model.entity.*;
 import com.selapak.selapakapi.model.request.LandRequest;
 import com.selapak.selapakapi.model.response.LandOwnerResponse;
+import com.selapak.selapakapi.model.response.LandPhotoResponse;
 import com.selapak.selapakapi.model.response.LandPriceWithoutLandResponse;
 import com.selapak.selapakapi.model.response.LandResponse;
 import com.selapak.selapakapi.repository.LandRepository;
-import com.selapak.selapakapi.service.BusinessTypeService;
-import com.selapak.selapakapi.service.LandOwnerService;
-import com.selapak.selapakapi.service.LandPriceService;
-import com.selapak.selapakapi.service.LandService;
+import com.selapak.selapakapi.service.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
@@ -30,6 +28,7 @@ public class LandServiceImpl implements LandService {
     private final LandOwnerService landOwnerService;
     private final LandPriceService landPriceService;
     private final BusinessTypeService businessTypeService;
+    private final LandPhotoService landPhotoService;
 
     @Override
     public Land getById(String id) {
@@ -80,9 +79,14 @@ public class LandServiceImpl implements LandService {
                         .build())
                 .collect(Collectors.toList());
 
-        land.setBusinessRecomendations(businessTypesRecomendation);
+        List<LandPhotoResponse> photoResponses = landPhotoService.create(land, landRequest);
 
-        landRepository.saveAndFlush(land);
+        land.setBusinessRecomendations(businessTypesRecomendation);
+        land.setLandPhotos(photoResponses.stream().map(landPhotoResponse -> LandPhoto.builder()
+                .id(landPhotoResponse.getId())
+                .imageURL(landPhotoResponse.getImageURL())
+                .isActive(landPhotoResponse.getIsActive())
+                .build()).toList());
 
         return convertToLandResponse(land);
     }
@@ -194,6 +198,12 @@ public class LandServiceImpl implements LandService {
                 .totalSlot(land.getTotalSlot())
                 .slotArea(land.getSlotArea())
                 .isActive(land.getIsActive())
+                .landPhotos(land.getLandPhotos().stream()
+                        .map(landPhoto -> LandPhotoResponse.builder()
+                                .id(landPhoto.getId())
+                                .imageURL(landPhoto.getImageURL())
+                                .isActive(landPhoto.getIsActive())
+                                .build()).toList())
                 .businessTypes(
                         land.getBusinessRecomendations().stream()
                                 .map(BusinessRecomendation::getBusinessType)

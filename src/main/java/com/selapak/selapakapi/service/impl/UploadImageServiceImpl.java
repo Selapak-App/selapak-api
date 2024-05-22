@@ -1,5 +1,6 @@
 package com.selapak.selapakapi.service.impl;
 
+import com.selapak.selapakapi.exception.ApplicationException;
 import com.selapak.selapakapi.service.UploadImageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,8 +28,7 @@ public class UploadImageServiceImpl implements UploadImageService {
                     RequestBody.fromInputStream(multipartFile.getInputStream(), multipartFile.getSize()));
             return s3Client.utilities().getUrl(builder -> builder.bucket(bucketName).key(fileName)).toExternalForm();
         } catch (IOException e) {
-            e.printStackTrace();
-            return null;
+            throw new ApplicationException("Gagal", "Gagal upload Foto", HttpStatus.CONFLICT);
         }
     }
 
@@ -40,8 +40,7 @@ public class UploadImageServiceImpl implements UploadImageService {
                     RequestBody.fromInputStream(multipartFile.getInputStream(), multipartFile.getSize()));
             return s3Client.utilities().getUrl(builder -> builder.bucket(bucketName).key(fileName)).toExternalForm();
         } catch (IOException e) {
-            e.printStackTrace();
-            return null;
+            throw new ApplicationException("Gagal", "Gagal upload Foto", HttpStatus.CONFLICT);
         }
     }
 }

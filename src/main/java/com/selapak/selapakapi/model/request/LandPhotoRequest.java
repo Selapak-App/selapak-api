@@ -6,11 +6,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(toBuilder = true)
 public class LandPhotoRequest {
     private String landId;
-    private MultipartFile multipartFile;
+    private List<MultipartFile> multipartFile;
 }
