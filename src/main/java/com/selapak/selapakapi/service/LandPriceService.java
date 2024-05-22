@@ -15,9 +15,9 @@ public interface LandPriceService {
 
     LandPrice update(LandPrice landPrice);
 
-    LandPrice createWithDto(LandPriceRequest request);
+    LandPriceResponse createWithDto(LandPriceRequest request);
 
-    LandPrice updateById(LandPriceUpdateRequest request);
+    LandPriceResponse updateById(LandPriceUpdateRequest request);
 
     List<LandPriceResponse> getAll();
 

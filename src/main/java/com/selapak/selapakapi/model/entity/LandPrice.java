@@ -31,7 +31,6 @@ public class LandPrice {
 
     @ManyToOne
     @JoinColumn(name = "land_id")
-    @JsonBackReference
     private Land land;
 
     @OneToMany(mappedBy = "landPrice")
