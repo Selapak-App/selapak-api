@@ -1,5 +1,7 @@
 package com.selapak.selapakapi.constant;
 
-public enum Verify {
+public enum SurveyStatus {
+    
     ACCEPTED, REJECTED, PENDING
+
 }

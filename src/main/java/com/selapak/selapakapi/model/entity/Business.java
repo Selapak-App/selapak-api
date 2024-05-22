@@ -12,6 +12,7 @@ import lombok.*;
 @Setter
 @Builder(toBuilder = true)
 public class Business {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
@@ -21,10 +22,13 @@ public class Business {
 
     private String description;
     private Boolean isActive;
+
     @ManyToOne
     @JoinColumn(name = "type_id")
     private BusinessType businessType;
+
     @ManyToOne
     @JoinColumn(name = "owner_id")
     private Customer customer;
+    
 }

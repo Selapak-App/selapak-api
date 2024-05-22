@@ -15,10 +15,13 @@ import com.selapak.selapakapi.model.entity.LandPrice;
 import com.selapak.selapakapi.model.request.LandPriceRequest;
 import com.selapak.selapakapi.model.request.LandPriceUpdateRequest;
 import com.selapak.selapakapi.model.response.CommonResponse;
+import com.selapak.selapakapi.model.response.LandPriceResponse;
 import com.selapak.selapakapi.service.LandPriceService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -51,12 +54,24 @@ public class LandPriceController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PutMapping(AppPath.UPDATE_BY_ID)
-    public ResponseEntity<?> updateLandPriceById(@PathVariable String id, @Valid @RequestBody LandPriceUpdateRequest request) {
-        LandPrice landPrice = landPriceService.updateById(id, request);
+    @PutMapping
+    public ResponseEntity<?> updateLandPriceById(@Valid @RequestBody LandPriceUpdateRequest request) {
+        LandPrice landPrice = landPriceService.updateById(request);
         CommonResponse<LandPrice> response = CommonResponse.<LandPrice>builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("Update land price successfully.")
+                .data(landPrice)
+                .build();
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<?> getAllLend() {
+        List<LandPriceResponse> landPrice = landPriceService.getAll();
+        CommonResponse<List<LandPriceResponse>> response = CommonResponse.<List<LandPriceResponse>>builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("Get land price successfully.")
                 .data(landPrice)
                 .build();
 

@@ -1,4 +1,4 @@
-package com.selapak.selapakapi.model.request;
+package com.selapak.selapakapi.model.response;
 
 import com.selapak.selapakapi.model.entity.Land;
 
@@ -10,10 +10,12 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-public class LandPriceUpdateRequest {
-    private String landId;
+@Builder(toBuilder = true)
+public class LandPriceResponse {
+
+    private String id;
     private Long price;
     private Land land;
+    private Boolean isActive;
     
 }

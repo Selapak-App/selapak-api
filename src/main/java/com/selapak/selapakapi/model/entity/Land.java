@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.selapak.selapakapi.constant.DbTableSchema;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.Cascade;
 
 import java.util.List;
 
@@ -16,9 +15,11 @@ import java.util.List;
 @Setter
 @Builder(toBuilder = true)
 public class Land {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
+
     private String address;
     private String district;
     private String village;
@@ -28,15 +29,19 @@ public class Land {
     private Integer slotAvailable;
     private Integer totalSlot;
     private Boolean isActive;
+
     @ManyToOne
     @JoinColumn(name = "land_owner_id")
     private LandOwner landOwner;
-    @OneToMany(mappedBy = "land",  cascade = CascadeType.ALL)
+
+    @OneToMany(mappedBy = "land", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonBackReference
-    private List<LandPrice> landPriceList;
+    private List<LandPrice> landPrices;
+
     @OneToMany(mappedBy = "land", cascade = CascadeType.ALL)
     @JsonBackReference
     private List<BusinessRecomendation> businessRecomendations;
+    
     @OneToMany(mappedBy = "land")
     @JsonBackReference
     private List<LandPhoto> landPhotos;

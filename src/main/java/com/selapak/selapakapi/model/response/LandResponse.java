@@ -1,6 +1,8 @@
 package com.selapak.selapakapi.model.response;
 
 import com.selapak.selapakapi.model.entity.BusinessType;
+import com.selapak.selapakapi.model.entity.LandPrice;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,6 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @Builder(toBuilder = true)
 public class LandResponse {
+    private String id;
     private String landOwnerId;
     private String address;
     private String district;
@@ -23,6 +26,6 @@ public class LandResponse {
     private Integer slotAvailable;
     private Integer totalSlot;
     private Boolean isActive;
-    private Long price;
+    private LandPrice landPrice;
     private List<BusinessType> businessTypes;
 }

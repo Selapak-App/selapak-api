@@ -1,6 +1,5 @@
 package com.selapak.selapakapi.model.request;
 
-import com.selapak.selapakapi.model.entity.BusinessType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
