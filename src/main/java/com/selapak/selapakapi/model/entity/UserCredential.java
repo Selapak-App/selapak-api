@@ -1,5 +1,6 @@
 package com.selapak.selapakapi.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.selapak.selapakapi.constant.DbTableSchema;
 
 import jakarta.persistence.Column;
@@ -42,6 +43,7 @@ public class UserCredential {
     private Admin admin;
 
     @OneToOne(mappedBy = "userCredential")
+    @JsonBackReference
     private Customer customer;
 
     @ManyToOne

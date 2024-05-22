@@ -1,4 +1,4 @@
-package com.selapak.selapakapi.model.response;
+package com.selapak.selapakapi.model.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,11 +9,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(toBuilder = true)
-public class LandPriceResponse {
+public class BusinessTypeResponse {
 
     private String id;
-    private Long price;
-    private LandLessResponse land;
-    private Boolean isActive;
+    private String name;
     
 }
