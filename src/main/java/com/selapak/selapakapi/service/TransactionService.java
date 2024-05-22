@@ -4,7 +4,7 @@ import org.springframework.data.domain.Page;
 
 import com.selapak.selapakapi.model.entity.Transaction;
 import com.selapak.selapakapi.model.request.TransactionRequest;
-import com.selapak.selapakapi.model.request.TransactionChangeStatusRequest;
+import com.selapak.selapakapi.model.request.TransactionVerifyRequest;
 import com.selapak.selapakapi.model.response.TransactionResponse;
 
 public interface TransactionService {
@@ -19,9 +19,9 @@ public interface TransactionService {
 
     void deleteById(String id);
 
-    TransactionResponse verifyApproveTransaction(String id, TransactionChangeStatusRequest request);
+    TransactionResponse verifyApproveTransaction(String id, TransactionVerifyRequest request);
 
-    TransactionResponse verifyRejectTransaction(String id, TransactionChangeStatusRequest request);
+    TransactionResponse verifyRejectTransaction(String id, TransactionVerifyRequest request);
 
     void doneSurveyLandTransaction(String id);
 

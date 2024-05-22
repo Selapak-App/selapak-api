@@ -1,6 +1,6 @@
 package com.selapak.selapakapi.service.impl;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 import com.selapak.selapakapi.exception.ApplicationException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -127,8 +127,8 @@ public class AuthServiceImpl implements AuthService {
                     .email(request.getEmail())
                     .gender(request.getGender())
                     .isActive(true)
-                    .createdAt(LocalDateTime.now())
-                    .updatedAt(LocalDateTime.now())
+                    .createdAt(Instant.now().toEpochMilli())
+                    .updatedAt(Instant.now().toEpochMilli())
                     .userCredential(userCredential)
                     .build();
             customerService.create(customer);

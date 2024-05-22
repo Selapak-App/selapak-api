@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.selapak.selapakapi.constant.AppPath;
-import com.selapak.selapakapi.model.request.TransactionChangeStatusRequest;
 import com.selapak.selapakapi.model.request.TransactionRequest;
+import com.selapak.selapakapi.model.request.TransactionVerifyRequest;
 import com.selapak.selapakapi.model.response.CommonResponse;
 import com.selapak.selapakapi.model.response.CommonResponseWithPage;
 import com.selapak.selapakapi.model.response.PagingResponse;
@@ -86,8 +86,8 @@ public class TransactionController {
     }
 
     @PutMapping(AppPath.TRANSACTION_APPROVE)
-    public ResponseEntity<?> approveTransaction(@PathVariable String transactionId, @RequestBody TransactionChangeStatusRequest request) {
-        TransactionResponse transactionResponse = transactionService.verifyApproveTransaction(transactionId, request);
+    public ResponseEntity<?> approveTransaction(@PathVariable String id, @RequestBody TransactionVerifyRequest request) {
+        TransactionResponse transactionResponse = transactionService.verifyApproveTransaction(id, request);
         CommonResponse<TransactionResponse> response = CommonResponse.<TransactionResponse>builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("Approve transaction successfully.")
@@ -98,7 +98,7 @@ public class TransactionController {
     }
 
     @PutMapping(AppPath.TRANSACTION_REJECT)
-    public ResponseEntity<?> rejectTransaction(@PathVariable String transactionId, @RequestBody TransactionChangeStatusRequest request) {
+    public ResponseEntity<?> rejectTransaction(@PathVariable String transactionId, @RequestBody TransactionVerifyRequest request) {
         TransactionResponse transactionResponse = transactionService.verifyRejectTransaction(transactionId, request);
         CommonResponse<TransactionResponse> response = CommonResponse.<TransactionResponse>builder()
                 .statusCode(HttpStatus.OK.value())

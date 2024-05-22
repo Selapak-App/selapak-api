@@ -1,6 +1,6 @@
 package com.selapak.selapakapi.service.impl;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -63,7 +63,7 @@ public class CustomerServiceImpl implements CustomerService {
                 .gender(request.getGender())
                 .nik(request.getNik())
                 .address(request.getAddress())
-                .updatedAt(LocalDateTime.now())
+                .updatedAt(Instant.now().toEpochMilli())
                 .build();
         customerRepository.save(existingCustomer);
 

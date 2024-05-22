@@ -1,7 +1,5 @@
 package com.selapak.selapakapi.model.response;
 
-import java.time.LocalDateTime;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,6 +19,6 @@ public class CustomerResponse {
     private String gender;
     private String nik;
     private Boolean isActive;
-    private LocalDateTime updatedAt;
+    private Long updatedAt;
     
 }
