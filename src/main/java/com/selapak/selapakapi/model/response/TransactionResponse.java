@@ -1,11 +1,5 @@
 package com.selapak.selapakapi.model.response;
 
-import com.selapak.selapakapi.model.entity.Admin;
-import com.selapak.selapakapi.model.entity.Business;
-import com.selapak.selapakapi.model.entity.Customer;
-import com.selapak.selapakapi.model.entity.LandPrice;
-import com.selapak.selapakapi.model.entity.RentPeriod;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,11 +18,11 @@ public class TransactionResponse {
     private String surveyStatus;
     private String paymentStatus;
     private String transactionStatus;
-    private Admin verifyBy;
-    private Customer customer;
-    private RentPeriod rentPeriod;
-    private LandPrice landPrice;
-    private Business business;
+    private AdminResponse verifyBy;
+    private CustomerResponse customer;
+    private RentPeriodResponse rentPeriod;
+    private LandPriceResponse landPrice;
+    private BusinessResponse business;
     private Long createdAt;
     private Long updatedAt;
     private Boolean isActive;

@@ -1,4 +1,4 @@
-package com.selapak.selapakapi.model.entity;
+package com.selapak.selapakapi.model.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
