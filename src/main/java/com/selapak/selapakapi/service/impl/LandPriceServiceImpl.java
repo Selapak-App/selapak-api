@@ -3,9 +3,12 @@ package com.selapak.selapakapi.service.impl;
 import org.springframework.stereotype.Service;
 
 import com.selapak.selapakapi.exception.LandPriceNotFoundException;
+import com.selapak.selapakapi.model.entity.LandOwner;
 import com.selapak.selapakapi.model.entity.LandPrice;
 import com.selapak.selapakapi.model.request.LandPriceRequest;
 import com.selapak.selapakapi.model.request.LandPriceUpdateRequest;
+import com.selapak.selapakapi.model.response.LandLessResponse;
+import com.selapak.selapakapi.model.response.LandOwnerResponse;
 import com.selapak.selapakapi.model.response.LandPriceResponse;
 import com.selapak.selapakapi.repository.LandPriceRepository;
 import com.selapak.selapakapi.service.LandPriceService;
@@ -37,21 +40,21 @@ public class LandPriceServiceImpl implements LandPriceService {
     }
 
     @Override
-    public LandPrice createWithDto(LandPriceRequest request) {
+    public LandPriceResponse createWithDto(LandPriceRequest request) {
         LandPrice landPrice = LandPrice.builder()
                 .price(request.getPrice())
                 .isActive(true)
                 .build();
 
-        return landPriceRepository.save(landPrice);
+        landPriceRepository.save(landPrice);
+
+        return convertToLandPriceResponse(landPrice);
     }
 
     @Override
-    public LandPrice updateById(LandPriceUpdateRequest request) {
-        // Try to retrieve existing LandPrice entity
+    public LandPriceResponse updateById(LandPriceUpdateRequest request) {
         LandPrice existingLandPrice = landPriceRepository.findById(request.getLandId()).orElse(null);
 
-        // If existing LandPrice is found, deactivate it
         if (existingLandPrice != null) {
             existingLandPrice = existingLandPrice.toBuilder()
                     .isActive(false)
@@ -59,15 +62,15 @@ public class LandPriceServiceImpl implements LandPriceService {
             landPriceRepository.saveAndFlush(existingLandPrice);
         }
 
-        // Create a new LandPrice entity with updated information
         LandPrice newLandPrice = LandPrice.builder()
                 .price(request.getPrice())
                 .land(request.getLand())
                 .isActive(true)
                 .build();
 
-        // Save and return the new LandPrice entity
-        return landPriceRepository.save(newLandPrice);
+        landPriceRepository.save(newLandPrice);
+
+        return convertToLandPriceResponse(newLandPrice);
     }
 
     @Override
@@ -86,10 +89,36 @@ public class LandPriceServiceImpl implements LandPriceService {
     }
 
     private LandPriceResponse convertToLandPriceResponse(LandPrice landPrice) {
+        LandOwner landOwner = landPrice.getLand().getLandOwner();
+
+        LandOwnerResponse landOwnerResponse = LandOwnerResponse.builder()
+                .id(landOwner.getId())
+                .name(landOwner.getName())
+                .email(landOwner.getEmail())
+                .phoneNumber(landOwner.getPhoneNumber())
+                .nik(landOwner.getNik())
+                .isActive(landOwner.getIsActive())
+                .build();
+
+        LandLessResponse land = LandLessResponse.builder()
+                .id(landPrice.getLand().getId())
+                .landOwner(landOwnerResponse)
+                .address(landPrice.getLand().getAddress())
+                .district(landPrice.getLand().getDistrict())
+                .village(landPrice.getLand().getVillage())
+                .postalCode(landPrice.getLand().getPostalCode())
+                .description(landPrice.getLand().getDescription())
+                .slotArea(landPrice.getLand().getSlotArea())
+                .slotAvailable(landPrice.getLand().getSlotAvailable())
+                .totalSlot(landPrice.getLand().getTotalSlot())
+                .isActive(landPrice.getLand().getIsActive())
+                .build();
+
+
         return LandPriceResponse.builder()
                 .id(landPrice.getId())
                 .price(landPrice.getPrice())
-                .land(landPrice.getLand())
+                .land(land)
                 .isActive(landPrice.getIsActive())
                 .build();
     }

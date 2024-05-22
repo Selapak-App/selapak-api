@@ -9,11 +9,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(toBuilder = true)
-public class LandPriceResponse {
+public class LandPriceWithoutLandResponse {
 
     private String id;
     private Long price;
-    private LandLessResponse land;
     private Boolean isActive;
     
 }
