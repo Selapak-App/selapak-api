@@ -9,9 +9,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(toBuilder = true)
-public class BusinessTypeRequest {
+public class TransactionVerifyRequest {
 
-    private String businessTypeId;
-    private String name;
+    private String adminId;
     
 }

@@ -13,6 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @Builder(toBuilder = true)
 public class LandPhotoRequest {
+    
     private String landId;
     private List<MultipartFile> multipartFile;
 }

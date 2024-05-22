@@ -18,8 +18,8 @@ import com.selapak.selapakapi.model.entity.Customer;
 import com.selapak.selapakapi.model.entity.LandPrice;
 import com.selapak.selapakapi.model.entity.RentPeriod;
 import com.selapak.selapakapi.model.entity.Transaction;
-import com.selapak.selapakapi.model.request.TransactionChangeStatusRequest;
 import com.selapak.selapakapi.model.request.TransactionRequest;
+import com.selapak.selapakapi.model.request.TransactionVerifyRequest;
 import com.selapak.selapakapi.model.response.AdminResponse;
 import com.selapak.selapakapi.model.response.BusinessResponse;
 import com.selapak.selapakapi.model.response.CustomerResponse;
@@ -121,24 +121,26 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public TransactionResponse verifyApproveTransaction(String id, TransactionChangeStatusRequest request) {
+    public TransactionResponse verifyApproveTransaction(String id, TransactionVerifyRequest request) {
         Transaction transaction = getById(id);
         Admin admin = adminService.getById(request.getAdminId());
 
         transaction.setVerifyStatus(Verify.APPROVED);
         transaction.setVerifiedBy(admin);
+        transaction.setUpdatedAt(Instant.now().toEpochMilli());
         transactionRepository.saveAndFlush(transaction);
 
         return convertToTransactionResponse(transaction);
     }
 
     @Override
-    public TransactionResponse verifyRejectTransaction(String id, TransactionChangeStatusRequest request) {
+    public TransactionResponse verifyRejectTransaction(String id, TransactionVerifyRequest request) {
         Transaction transaction = getById(id);
         Admin admin = adminService.getById(request.getAdminId());
 
         transaction.setVerifyStatus(Verify.REJECTED);
         transaction.setVerifiedBy(admin);
+        transaction.setUpdatedAt(Instant.now().toEpochMilli());
         transaction.setTransactionStatus(TrxStatus.FAILED);
         transactionRepository.saveAndFlush(transaction);
 
@@ -149,6 +151,7 @@ public class TransactionServiceImpl implements TransactionService {
     public void doneSurveyLandTransaction(String id) {
         Transaction transaction = getById(id);
         transaction.setIsSurveyed(true);
+        transaction.setUpdatedAt(Instant.now().toEpochMilli());
         transactionRepository.saveAndFlush(transaction);
     }
 
@@ -156,6 +159,7 @@ public class TransactionServiceImpl implements TransactionService {
     public TransactionResponse acceptTransactionAfterSurveyByCustomer(String id) {
         Transaction transaction = getById(id);
         transaction.setSurveyStatus(SurveyStatus.ACCEPTED);
+        transaction.setUpdatedAt(Instant.now().toEpochMilli());
         transactionRepository.saveAndFlush(transaction);
 
         return convertToTransactionResponse(transaction);
@@ -166,6 +170,7 @@ public class TransactionServiceImpl implements TransactionService {
         Transaction transaction = getById(id);
         transaction.setSurveyStatus(SurveyStatus.DECLINED);
         transaction.setTransactionStatus(TrxStatus.FAILED);
+        transaction.setUpdatedAt(Instant.now().toEpochMilli());
         transactionRepository.saveAndFlush(transaction);
 
         return convertToTransactionResponse(transaction);
@@ -176,6 +181,7 @@ public class TransactionServiceImpl implements TransactionService {
         Transaction transaction = getById(id);
         transaction.setPaymentStatus(Payment.PAID);
         transaction.setTransactionStatus(TrxStatus.DONE);
+        transaction.setUpdatedAt(Instant.now().toEpochMilli());
         transactionRepository.saveAndFlush(transaction);
 
         return convertToTransactionResponse(transaction);

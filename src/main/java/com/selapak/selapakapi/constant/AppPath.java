@@ -22,11 +22,11 @@ public class AppPath {
     public final static String UPDATE_BY_ID = "/{id}";
     public final static String DELETE_BY_ID = "/{id}";
 
-    public final static String TRANSACTION_APPROVE = TRANSACTION_PATH + "/approve/{transactionId}";
-    public final static String TRANSACTION_REJECT = TRANSACTION_PATH + "/reject/{transactionId}";
-    public final static String TRANSACTION_SURVEY = TRANSACTION_PATH + "/survey/{transactionId}";
-    public final static String TRANSACTION_ACCEPT = TRANSACTION_PATH + "/accept/{transactionId}";
-    public final static String TRANSACTION_DECLINE = TRANSACTION_PATH + "/decline/{transactionId}";
-    public final static String TRANSACTION_PAY = TRANSACTION_PATH + "/pay/{transactionId}";
+    public final static String TRANSACTION_APPROVE = "/approve/{transactionId}";
+    public final static String TRANSACTION_REJECT = "/reject/{transactionId}";
+    public final static String TRANSACTION_SURVEY = "/survey/{transactionId}";
+    public final static String TRANSACTION_ACCEPT = "/accept/{transactionId}";
+    public final static String TRANSACTION_DECLINE = "/decline/{transactionId}";
+    public final static String TRANSACTION_PAY = "/pay/{transactionId}";
 
 }
