@@ -10,6 +10,7 @@ import com.selapak.selapakapi.constant.AppPath;
 import com.selapak.selapakapi.model.request.LoginRequest;
 import com.selapak.selapakapi.model.request.RegisterAdminRequest;
 import com.selapak.selapakapi.model.request.RegisterCustomerRequest;
+import com.selapak.selapakapi.model.request.RegisterSuperAdminRequest;
 import com.selapak.selapakapi.model.response.CommonResponse;
 import com.selapak.selapakapi.model.response.LoginResponse;
 import com.selapak.selapakapi.model.response.RegisterResponse;
@@ -48,9 +49,22 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @PostMapping(AppPath.REGISTER_SUPER_ADMIN_PATH)
+    public ResponseEntity<?> registerSuperAdmin(@Valid @RequestBody RegisterSuperAdminRequest request) {
+        RegisterResponse registerResponse = authService.registerSuperAdmin(request);
+        CommonResponse<RegisterResponse> response = CommonResponse.<RegisterResponse>builder()
+                .statusCode(HttpStatus.CREATED.value())
+                .message("Super admin created successfully.")
+                .data(registerResponse)
+                .build();
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+
     @PostMapping(AppPath.LOGIN_ADMIN_PATH)
     public ResponseEntity<?> loginAdmin(@Valid @RequestBody LoginRequest request) {
-        LoginResponse loginResponse = authService.loginAdmin(request);
+        LoginResponse loginResponse = authService.loginAdminAndSuperAdmin(request);
         CommonResponse<LoginResponse> response = CommonResponse.<LoginResponse>builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("Login successfully.")

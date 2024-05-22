@@ -2,7 +2,6 @@ package com.selapak.selapakapi.service.impl;
 
 import com.selapak.selapakapi.exception.LandNotFoundException;
 import com.selapak.selapakapi.model.entity.*;
-import com.selapak.selapakapi.model.request.LandPriceUpdateRequest;
 import com.selapak.selapakapi.model.request.LandRequest;
 import com.selapak.selapakapi.model.response.LandResponse;
 import com.selapak.selapakapi.repository.LandRepository;
@@ -17,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -60,7 +60,12 @@ public class LandServiceImpl implements LandService {
                 .isActive(true)
                 .build();
 
-        landPriceService.create(landPrice);
+        landPrice = landPriceService.create(landPrice);
+
+        if (land.getLandPrices() == null) {
+            land.setLandPrices(new ArrayList<>());
+        }
+        land.getLandPrices().add(landPrice);
 
         List<BusinessType> businessTypes = landRequest.getBusinessTypes().stream()
                 .map(businessTypesRequest -> businessTypeService.getById(businessTypesRequest.getBusinessTypeId()))
@@ -74,7 +79,6 @@ public class LandServiceImpl implements LandService {
                 .collect(Collectors.toList());
 
         land.setBusinessRecomendations(businessTypesRecomendation);
-        land.setLandPrice(landPrice);
 
         landRepository.saveAndFlush(land);
 
@@ -96,11 +100,12 @@ public class LandServiceImpl implements LandService {
     }
 
     @Override
+    @Transactional(rollbackOn = Exception.class)
     public LandResponse updateById(String id, LandRequest request) {
         Land existingLand = getById(id);
-
         LandOwner landOwner = landOwnerService.getById(request.getLandOwnerId());
 
+        // Update properties of existing land
         existingLand = existingLand.toBuilder()
                 .landOwner(landOwner)
                 .address(request.getAddress())
@@ -113,14 +118,33 @@ public class LandServiceImpl implements LandService {
                 .totalSlot(request.getTotalSlot())
                 .isActive(true)
                 .build();
+
         landRepository.saveAndFlush(existingLand);
 
-        LandPriceUpdateRequest landPrice = LandPriceUpdateRequest.builder()
-                .landId(existingLand.getLandPrice().getId())
-                .price(request.getPrice())
-                .build();
-        
-        landPriceService.updateById(landPrice);
+        // Handle LandPrice update
+        if (request.getPrice() != null) {
+            // Get the existing active LandPrice and deactivate it
+            for (LandPrice lp : existingLand.getLandPrices()) {
+                if (lp.getIsActive()) {
+                    lp.setIsActive(false);
+                    landPriceService.update(lp);
+                }
+            }
+
+            // Create new LandPrice
+            LandPrice landPrice = LandPrice.builder()
+                    .price(request.getPrice())
+                    .land(existingLand)
+                    .isActive(true)
+                    .build();
+
+            landPriceService.create(landPrice);
+
+            // Add new LandPrice to the land's list of landPrices
+            existingLand.getLandPrices().add(landPrice);
+        }
+
+        landRepository.saveAndFlush(existingLand);
 
         return convertToLandResponse(existingLand);
     }
@@ -132,7 +156,19 @@ public class LandServiceImpl implements LandService {
         landRepository.saveAndFlush(land);
     }
 
+    @Override
+    public void decreaseLandSlotAvailable(String id, Integer quantity) {
+        Land land = getById(id);
+        land.setSlotAvailable(land.getSlotAvailable() - quantity);
+        landRepository.saveAndFlush(land);
+    }
+
     private LandResponse convertToLandResponse(Land land) {
+        LandPrice activeLandPrice = land.getLandPrices().stream()
+                .filter(LandPrice::getIsActive)
+                .findFirst()
+                .orElse(null);
+
         LandResponse landResponse = LandResponse.builder()
                 .id(land.getId())
                 .landOwnerId(land.getLandOwner().getId())
@@ -141,12 +177,15 @@ public class LandServiceImpl implements LandService {
                 .village(land.getVillage())
                 .postalCode(land.getPostalCode())
                 .description(land.getDescription())
-                .price(land.getLandPrice().getPrice())
+                .landPrice(activeLandPrice)
                 .slotAvailable(land.getSlotAvailable())
                 .totalSlot(land.getTotalSlot())
                 .slotArea(land.getSlotArea())
                 .isActive(land.getIsActive())
-                .businessTypes(land.getBusinessRecomendations().stream().map(BusinessRecomendation::getBusinessType).toList())
+                .businessTypes(
+                        land.getBusinessRecomendations().stream()
+                                .map(BusinessRecomendation::getBusinessType)
+                                .toList())
                 .build();
 
         return landResponse;

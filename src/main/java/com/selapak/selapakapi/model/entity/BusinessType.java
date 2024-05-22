@@ -31,7 +31,9 @@ public class BusinessType {
     @OneToMany(mappedBy = "businessType")
     @JsonBackReference
     private List<BusinessRecomendation> businessRecomendations;
+
     @OneToMany(mappedBy = "businessType")
     @JsonBackReference
     private List<Business> businessList;
+    
 }
