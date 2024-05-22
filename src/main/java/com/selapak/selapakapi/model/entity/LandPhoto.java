@@ -15,10 +15,13 @@ public class LandPhoto {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
-    private String fileName;
-    private Long fileSize;
-    private String filePath;
+
+    @Column(name= "image_url")
+    private String imageURL;
+
     @ManyToOne
     @JoinColumn(name = "land_id")
     private Land land;
+
+    private Boolean isActive;
 }

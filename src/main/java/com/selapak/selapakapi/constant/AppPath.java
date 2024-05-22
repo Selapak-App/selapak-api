@@ -9,12 +9,12 @@ public class AppPath {
     public final static String LAND_PRICE_PATH = "/api/land-prices";
     public final static String BUSINESS_TYPE_PATH = "/api/business-types";
     public final static String LAND_PATH = "/api/lands";
+    public final static String LAND_PHOTO_PATH = "/land-photos";
     public final static String TRANSACTION_PATH = "/api/transactions";
-
 
     public final static String REGISTER_PATH = "/api/auth/register";
     public final static String LOGIN_PATH = "/api/auth/login";
-    public final static String REGISTER_SUPER_ADMIN_PATH = "/api/auth/super-admins/register";
+    public final static String REGISTER_SUPER_ADMIN_PATH = "/api/auth/super-admin/register";
     public final static String REGISTER_ADMIN_PATH = "/api/auth/admin/register";
     public final static String LOGIN_ADMIN_PATH = "/api/auth/admin/login";
 
@@ -28,8 +28,5 @@ public class AppPath {
     public final static String TRANSACTION_ACCEPT = TRANSACTION_PATH + "/accept/{transactionId}";
     public final static String TRANSACTION_DECLINE = TRANSACTION_PATH + "/decline/{transactionId}";
     public final static String TRANSACTION_PAY = TRANSACTION_PATH + "/pay/{transactionId}";
-
-
-
 
 }

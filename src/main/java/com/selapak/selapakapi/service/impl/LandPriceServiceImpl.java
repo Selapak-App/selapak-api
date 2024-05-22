@@ -1,5 +1,7 @@
 package com.selapak.selapakapi.service.impl;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.selapak.selapakapi.exception.LandPriceNotFoundException;
@@ -14,9 +16,6 @@ import com.selapak.selapakapi.repository.LandPriceRepository;
 import com.selapak.selapakapi.service.LandPriceService;
 
 import lombok.RequiredArgsConstructor;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -74,11 +73,10 @@ public class LandPriceServiceImpl implements LandPriceService {
     }
 
     @Override
-    public List<LandPriceResponse> getAll() {
-        List<LandPrice> landPrices = landPriceRepository.findAll();
-        return landPrices.stream()
-                .map(this::convertToLandPriceResponse)
-                .collect(Collectors.toList());
+    public Page<LandPriceResponse> getAll(Integer page, Integer size) {
+        Page<LandPrice> landPrices = landPriceRepository.findAll(PageRequest.of(page, size));
+        
+        return landPrices.map(this::convertToLandPriceResponse);
     }
 
     @Override

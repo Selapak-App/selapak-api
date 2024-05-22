@@ -5,7 +5,7 @@ import com.selapak.selapakapi.model.request.LandPriceRequest;
 import com.selapak.selapakapi.model.request.LandPriceUpdateRequest;
 import com.selapak.selapakapi.model.response.LandPriceResponse;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
 
 public interface LandPriceService {
     
@@ -19,7 +19,7 @@ public interface LandPriceService {
 
     LandPriceResponse updateById(LandPriceUpdateRequest request);
 
-    List<LandPriceResponse> getAll();
+    Page<LandPriceResponse> getAll(Integer page, Integer size);
 
     void deleteById(String id);
 
