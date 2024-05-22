@@ -20,14 +20,28 @@ public class UploadImageServiceImpl implements UploadImageService {
     @Value("${aws.bucket.name}")
     private String bucketName;
     @Override
-    public String uploadImage(MultipartFile multipartFile) {
+    public String uploadImageLand(MultipartFile multipartFile) {
         try {
             String fileName = "land-images/" + System.currentTimeMillis() + "-" + multipartFile.getOriginalFilename();
             s3Client.putObject(builder -> builder.bucket(bucketName).key(fileName).build(),
                     RequestBody.fromInputStream(multipartFile.getInputStream(), multipartFile.getSize()));
             return s3Client.utilities().getUrl(builder -> builder.bucket(bucketName).key(fileName)).toExternalForm();
         } catch (IOException e) {
-            throw new RuntimeException(e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    public String uploadImageUmkn(MultipartFile multipartFile) {
+        try {
+            String fileName = "umkm-images/" + System.currentTimeMillis() + "-" + multipartFile.getOriginalFilename();
+            s3Client.putObject(builder -> builder.bucket(bucketName).key(fileName).build(),
+                    RequestBody.fromInputStream(multipartFile.getInputStream(), multipartFile.getSize()));
+            return s3Client.utilities().getUrl(builder -> builder.bucket(bucketName).key(fileName)).toExternalForm();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 }

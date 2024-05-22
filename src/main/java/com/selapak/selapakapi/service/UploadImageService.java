@@ -4,5 +4,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface UploadImageService {
 
-    String uploadImage(MultipartFile multipartFile);
+    String uploadImageLand(MultipartFile multipartFile);
+    String uploadImageUmkn(MultipartFile multipartFile);
 }
