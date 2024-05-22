@@ -2,6 +2,7 @@ package com.selapak.selapakapi.constant;
 
 public class AppPath {
 
+    public final static String SUPER_ADMIN_PATH = "/api/super-admins";
     public final static String CUSTOMER_PATH = "/api/customers";
     public final static String RENT_PERIOD_PATH = "/api/rent-periods";
     public final static String LAND_OWNER_PATH = "/api/land-owners";
@@ -13,6 +14,7 @@ public class AppPath {
 
     public final static String REGISTER_PATH = "/api/auth/register";
     public final static String LOGIN_PATH = "/api/auth/login";
+    public final static String REGISTER_SUPER_ADMIN_PATH = "/api/auth/super-admins/register";
     public final static String REGISTER_ADMIN_PATH = "/api/auth/admin/register";
     public final static String LOGIN_ADMIN_PATH = "/api/auth/admin/login";
 
@@ -20,9 +22,14 @@ public class AppPath {
     public final static String UPDATE_BY_ID = "/{id}";
     public final static String DELETE_BY_ID = "/{id}";
 
-    public final static String REGISTER_SUPER_ADMIN_PATH = SUPER_ADMIN_PATH + REGISTER_PATH;
-    public final static String REGISTER_ADMIN_PATH = ADMIN_PATH + REGISTER_PATH;
-    public final static String LOGIN_ADMIN_PATH = ADMIN_PATH + LOGIN_PATH;
+    public final static String TRANSACTION_APPROVE = TRANSACTION_PATH + "/approve/{transactionId}";
+    public final static String TRANSACTION_REJECT = TRANSACTION_PATH + "/reject/{transactionId}";
+    public final static String TRANSACTION_SURVEY = TRANSACTION_PATH + "/survey/{transactionId}";
+    public final static String TRANSACTION_ACCEPT = TRANSACTION_PATH + "/accept/{transactionId}";
+    public final static String TRANSACTION_DECLINE = TRANSACTION_PATH + "/decline/{transactionId}";
+    public final static String TRANSACTION_PAY = TRANSACTION_PATH + "/pay/{transactionId}";
+
+
 
 
 }

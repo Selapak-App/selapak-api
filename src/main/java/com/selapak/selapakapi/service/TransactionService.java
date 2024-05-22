@@ -23,11 +23,13 @@ public interface TransactionService {
 
     TransactionResponse verifyRejectTransaction(String id, TransactionChangeStatusRequest request);
 
-    void surveyTransaction(String id, TransactionChangeStatusRequest request);
+    void doneSurveyLandTransaction(String id);
 
-    void dealTransaction(String id);
+    TransactionResponse acceptTransactionAfterSurveyByCustomer(String id);
 
-    void payTransaction(String id);
+    TransactionResponse declineTransactionAfterSurveyByCustomer(String id);
+
+    TransactionResponse payTransaction(String id);
 
 
 
