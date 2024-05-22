@@ -44,8 +44,8 @@ public class LandPriceController {
 
     @PostMapping
     public ResponseEntity<?> createLandPrice(@Valid @RequestBody LandPriceRequest request) {
-        LandPrice landPrice = landPriceService.createWithDto(request);
-        CommonResponse<LandPrice> response = CommonResponse.<LandPrice>builder()
+        LandPriceResponse landPrice = landPriceService.createWithDto(request);
+        CommonResponse<LandPriceResponse> response = CommonResponse.<LandPriceResponse>builder()
                 .statusCode(HttpStatus.CREATED.value())
                 .message("Create land price successfully.")
                 .data(landPrice)
@@ -56,8 +56,8 @@ public class LandPriceController {
 
     @PutMapping
     public ResponseEntity<?> updateLandPriceById(@Valid @RequestBody LandPriceUpdateRequest request) {
-        LandPrice landPrice = landPriceService.updateById(request);
-        CommonResponse<LandPrice> response = CommonResponse.<LandPrice>builder()
+        LandPriceResponse landPrice = landPriceService.updateById(request);
+        CommonResponse<LandPriceResponse> response = CommonResponse.<LandPriceResponse>builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("Update land price successfully.")
                 .data(landPrice)

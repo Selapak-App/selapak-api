@@ -3,6 +3,8 @@ package com.selapak.selapakapi.service.impl;
 import com.selapak.selapakapi.exception.LandNotFoundException;
 import com.selapak.selapakapi.model.entity.*;
 import com.selapak.selapakapi.model.request.LandRequest;
+import com.selapak.selapakapi.model.response.LandOwnerResponse;
+import com.selapak.selapakapi.model.response.LandPriceWithoutLandResponse;
 import com.selapak.selapakapi.model.response.LandResponse;
 import com.selapak.selapakapi.repository.LandRepository;
 import com.selapak.selapakapi.service.BusinessTypeService;
@@ -105,7 +107,6 @@ public class LandServiceImpl implements LandService {
         Land existingLand = getById(id);
         LandOwner landOwner = landOwnerService.getById(request.getLandOwnerId());
 
-        // Update properties of existing land
         existingLand = existingLand.toBuilder()
                 .landOwner(landOwner)
                 .address(request.getAddress())
@@ -121,9 +122,7 @@ public class LandServiceImpl implements LandService {
 
         landRepository.saveAndFlush(existingLand);
 
-        // Handle LandPrice update
         if (request.getPrice() != null) {
-            // Get the existing active LandPrice and deactivate it
             for (LandPrice lp : existingLand.getLandPrices()) {
                 if (lp.getIsActive()) {
                     lp.setIsActive(false);
@@ -131,7 +130,6 @@ public class LandServiceImpl implements LandService {
                 }
             }
 
-            // Create new LandPrice
             LandPrice landPrice = LandPrice.builder()
                     .price(request.getPrice())
                     .land(existingLand)
@@ -140,7 +138,6 @@ public class LandServiceImpl implements LandService {
 
             landPriceService.create(landPrice);
 
-            // Add new LandPrice to the land's list of landPrices
             existingLand.getLandPrices().add(landPrice);
         }
 
@@ -164,20 +161,35 @@ public class LandServiceImpl implements LandService {
     }
 
     private LandResponse convertToLandResponse(Land land) {
+        LandOwnerResponse landOwner = LandOwnerResponse.builder()
+                .id(land.getLandOwner().getId())
+                .name(land.getLandOwner().getName())
+                .email(land.getLandOwner().getEmail())
+                .phoneNumber(land.getLandOwner().getPhoneNumber())
+                .nik(land.getLandOwner().getNik())
+                .isActive(land.getLandOwner().getIsActive())
+                .build();
+
         LandPrice activeLandPrice = land.getLandPrices().stream()
                 .filter(LandPrice::getIsActive)
                 .findFirst()
                 .orElse(null);
 
+        LandPriceWithoutLandResponse landPrice = LandPriceWithoutLandResponse.builder()
+                .id(activeLandPrice.getId())
+                .price(activeLandPrice.getPrice())
+                .isActive(activeLandPrice.getIsActive())
+                .build();
+
         LandResponse landResponse = LandResponse.builder()
                 .id(land.getId())
-                .landOwnerId(land.getLandOwner().getId())
+                .landOwner(landOwner)
                 .address(land.getAddress())
                 .district(land.getDistrict())
                 .village(land.getVillage())
                 .postalCode(land.getPostalCode())
                 .description(land.getDescription())
-                .landPrice(activeLandPrice)
+                .landPrice(landPrice)
                 .slotAvailable(land.getSlotAvailable())
                 .totalSlot(land.getTotalSlot())
                 .slotArea(land.getSlotArea())

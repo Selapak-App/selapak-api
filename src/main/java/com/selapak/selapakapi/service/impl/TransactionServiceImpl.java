@@ -17,6 +17,7 @@ import com.selapak.selapakapi.model.entity.Customer;
 import com.selapak.selapakapi.model.entity.LandPrice;
 import com.selapak.selapakapi.model.entity.RentPeriod;
 import com.selapak.selapakapi.model.entity.Transaction;
+import com.selapak.selapakapi.model.request.TransactionChangeStatusRequest;
 import com.selapak.selapakapi.model.request.TransactionRequest;
 import com.selapak.selapakapi.model.response.TransactionResponse;
 import com.selapak.selapakapi.repository.TransactionRepository;
@@ -109,23 +110,52 @@ public class TransactionServiceImpl implements TransactionService {
         transactionRepository.saveAndFlush(transaction);
     }
 
+    
+
+    @Override
+    public void dealTransaction(String id) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void payTransaction(String id) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void surveyTransaction(String id, TransactionChangeStatusRequest request) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public TransactionResponse verifyApproveTransaction(String id, TransactionChangeStatusRequest request) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public TransactionResponse verifyRejectTransaction(String id, TransactionChangeStatusRequest request) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
     private TransactionResponse convertToTransactionResponse(Transaction transaction) {
         return TransactionResponse.builder()
                 .id(transaction.getId())
                 .quantity(transaction.getQuantity())
-                .verifyBy(transaction.getVerifiedBy() != null ? transaction.getVerifiedBy().getName() : null)
+                .verifyBy(transaction.getVerifiedBy())
                 .verifyStatus(transaction.getVerifyStatus().toString())
                 .isSurveyed(transaction.getIsSurveyed())
                 .surveyStatus(transaction.getSurveyStatus().toString())
                 .paymentStatus(transaction.getPaymentStatus().toString())
                 .transactionStatus(transaction.getTransactionStatus().toString())
-                .customer(transaction.getCustomer().getFullName())
-                .rentPeriod(transaction.getRentPeriod().getPeriod())
-                .landAddress(transaction.getLandPrice().getLand().getAddress())
-                .landPrice(transaction.getLandPrice().getPrice())
-                .businessName(transaction.getBusiness().getBusinessName())
-                .businessDescription(transaction.getBusiness().getDescription())
-                .businessType(transaction.getBusiness().getBusinessType().getName())
+                .customer(transaction.getCustomer())
+                .rentPeriod(transaction.getRentPeriod())
+                .landPrice(transaction.getLandPrice())
+                .business(transaction.getBusiness())
                 .createdAt(transaction.getCreatedAt())
                 .updatedAt(transaction.getUpdatedAt())
                 .isActive(transaction.getIsActive())
