@@ -86,8 +86,8 @@ public class TransactionController {
     }
 
     @PutMapping(AppPath.TRANSACTION_APPROVE)
-    public ResponseEntity<?> approveTransaction(@PathVariable String id, @RequestBody TransactionVerifyRequest request) {
-        TransactionResponse transactionResponse = transactionService.verifyApproveTransaction(id, request);
+    public ResponseEntity<?> approveTransaction(@PathVariable String transactionId, @RequestBody TransactionVerifyRequest request) {
+        TransactionResponse transactionResponse = transactionService.verifyApproveTransaction(transactionId, request);
         CommonResponse<TransactionResponse> response = CommonResponse.<TransactionResponse>builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("Approve transaction successfully.")
