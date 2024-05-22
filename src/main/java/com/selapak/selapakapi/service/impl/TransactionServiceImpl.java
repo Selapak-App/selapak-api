@@ -11,6 +11,7 @@ import com.selapak.selapakapi.constant.SurveyStatus;
 import com.selapak.selapakapi.constant.TrxStatus;
 import com.selapak.selapakapi.constant.Verify;
 import com.selapak.selapakapi.exception.TransactionNotFoundException;
+import com.selapak.selapakapi.model.entity.Admin;
 import com.selapak.selapakapi.model.entity.Business;
 import com.selapak.selapakapi.model.entity.BusinessType;
 import com.selapak.selapakapi.model.entity.Customer;
@@ -19,8 +20,16 @@ import com.selapak.selapakapi.model.entity.RentPeriod;
 import com.selapak.selapakapi.model.entity.Transaction;
 import com.selapak.selapakapi.model.request.TransactionChangeStatusRequest;
 import com.selapak.selapakapi.model.request.TransactionRequest;
+import com.selapak.selapakapi.model.response.AdminResponse;
+import com.selapak.selapakapi.model.response.BusinessResponse;
+import com.selapak.selapakapi.model.response.CustomerResponse;
+import com.selapak.selapakapi.model.response.LandLessResponse;
+import com.selapak.selapakapi.model.response.LandOwnerResponse;
+import com.selapak.selapakapi.model.response.LandPriceResponse;
+import com.selapak.selapakapi.model.response.RentPeriodResponse;
 import com.selapak.selapakapi.model.response.TransactionResponse;
 import com.selapak.selapakapi.repository.TransactionRepository;
+import com.selapak.selapakapi.service.AdminService;
 import com.selapak.selapakapi.service.BusinessService;
 import com.selapak.selapakapi.service.BusinessTypeService;
 import com.selapak.selapakapi.service.CustomerService;
@@ -37,6 +46,7 @@ import lombok.RequiredArgsConstructor;
 public class TransactionServiceImpl implements TransactionService {
 
     private final TransactionRepository transactionRepository;
+    private final AdminService adminService;
     private final CustomerService customerService;
     private final RentPeriodService rentPeriodService;
     private final LandPriceService landPriceService;
@@ -110,24 +120,22 @@ public class TransactionServiceImpl implements TransactionService {
         transactionRepository.saveAndFlush(transaction);
     }
 
-    
-
     @Override
     public void dealTransaction(String id) {
         // TODO Auto-generated method stub
-        
+
     }
 
     @Override
     public void payTransaction(String id) {
         // TODO Auto-generated method stub
-        
+
     }
 
     @Override
     public void surveyTransaction(String id, TransactionChangeStatusRequest request) {
         // TODO Auto-generated method stub
-        
+
     }
 
     @Override
@@ -143,23 +151,91 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     private TransactionResponse convertToTransactionResponse(Transaction transaction) {
+        AdminResponse adminResponse = null;
+        if (transaction.getVerifiedBy() != null) {
+            Admin admin = adminService.getById(transaction.getVerifiedBy().getId());
+            adminResponse = AdminResponse.builder()
+                    .id(admin.getId())
+                    .name(admin.getName())
+                    .email(admin.getEmail())
+                    .isActive(admin.getIsActive())
+                    .build();
+        } 
+
+        Customer customer = customerService.getById(transaction.getCustomer().getId());
+        CustomerResponse customerResponse = CustomerResponse.builder()
+                .id(customer.getId())
+                .fullName(customer.getFullName())
+                .phoneNumber(customer.getPhoneNumber())
+                .email(customer.getEmail())
+                .gender(customer.getGender().toString())
+                .address(customer.getAddress())
+                .nik(customer.getNik())
+                .isActive(customer.getIsActive())
+                .updatedAt(customer.getUpdatedAt())
+                .build();
+
+        RentPeriod rentPeriod = rentPeriodService.getById(transaction.getRentPeriod().getId());
+        RentPeriodResponse rentPeriodResponse = RentPeriodResponse.builder()
+                .id(rentPeriod.getId())
+                .period(rentPeriod.getPeriod())
+                .build();
+
+        LandPrice landPrice = landPriceService.getById(transaction.getLandPrice().getId());
+        LandOwnerResponse landOwnerResponse = LandOwnerResponse.builder()
+                .id(landPrice.getLand().getLandOwner().getId())
+                .name(landPrice.getLand().getLandOwner().getName())
+                .email(landPrice.getLand().getLandOwner().getEmail())
+                .phoneNumber(landPrice.getLand().getLandOwner().getPhoneNumber())
+                .nik(landPrice.getLand().getLandOwner().getNik())
+                .isActive(landPrice.getLand().getLandOwner().getIsActive())
+                .build();
+        LandLessResponse land = LandLessResponse.builder()
+                .id(landPrice.getLand().getId())
+                .landOwner(landOwnerResponse)
+                .address(landPrice.getLand().getAddress())
+                .district(landPrice.getLand().getDistrict())
+                .village(landPrice.getLand().getVillage())
+                .postalCode(landPrice.getLand().getPostalCode())
+                .description(landPrice.getLand().getDescription())
+                .slotArea(landPrice.getLand().getSlotArea())
+                .slotAvailable(landPrice.getLand().getSlotAvailable())
+                .totalSlot(landPrice.getLand().getTotalSlot())
+                .isActive(landPrice.getLand().getIsActive())
+                .build();
+        LandPriceResponse landPriceResponse = LandPriceResponse.builder()
+                .id(landPrice.getId())
+                .price(landPrice.getPrice())
+                .land(land)
+                .isActive(landPrice.getIsActive())
+                .build();
+
+        Business business = businessService.getById(transaction.getBusiness().getId());
+        BusinessResponse businessResponse = BusinessResponse.builder()
+                .id(business.getId())
+                .businessName(business.getBusinessName())
+                .descripttion(business.getDescription())
+                .businessType(business.getBusinessType().getName())
+                .isActive(business.getIsActive())
+                .build();
+
         return TransactionResponse.builder()
                 .id(transaction.getId())
                 .quantity(transaction.getQuantity())
-                .verifyBy(transaction.getVerifiedBy())
+                .verifyBy(adminResponse)
                 .verifyStatus(transaction.getVerifyStatus().toString())
                 .isSurveyed(transaction.getIsSurveyed())
                 .surveyStatus(transaction.getSurveyStatus().toString())
                 .paymentStatus(transaction.getPaymentStatus().toString())
                 .transactionStatus(transaction.getTransactionStatus().toString())
-                .customer(transaction.getCustomer())
-                .rentPeriod(transaction.getRentPeriod())
-                .landPrice(transaction.getLandPrice())
-                .business(transaction.getBusiness())
+                .customer(customerResponse)
+                .rentPeriod(rentPeriodResponse)
+                .landPrice(landPriceResponse)
+                .business(businessResponse)
                 .createdAt(transaction.getCreatedAt())
                 .updatedAt(transaction.getUpdatedAt())
                 .isActive(transaction.getIsActive())
                 .build();
     }
-    
+
 }
