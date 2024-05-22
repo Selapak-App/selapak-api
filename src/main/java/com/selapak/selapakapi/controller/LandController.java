@@ -7,16 +7,11 @@ import com.selapak.selapakapi.model.response.CommonResponseWithPage;
 import com.selapak.selapakapi.model.response.LandResponse;
 import com.selapak.selapakapi.model.response.PagingResponse;
 import com.selapak.selapakapi.service.LandService;
-import com.selapak.selapakapi.service.UploadImageService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -46,7 +41,7 @@ public class LandController {
 
     @GetMapping
     public ResponseEntity<?> getAllLands(@RequestParam(defaultValue = "1") Integer page,
-            @RequestParam(defaultValue = "10") Integer size) {
+            @RequestParam(defaultValue = "5") Integer size) {
         Page<LandResponse> landResponses = landService.getAll(page - 1, size);
         PagingResponse pagingResponse = PagingResponse.builder()
                 .currentPage(page)

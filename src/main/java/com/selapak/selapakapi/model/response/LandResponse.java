@@ -14,6 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @Builder(toBuilder = true)
 public class LandResponse {
+
     private String id;
     private LandOwnerResponse landOwner;
     private String address;
@@ -28,4 +29,5 @@ public class LandResponse {
     private List<LandPhotoResponse> landPhotos;
     private LandPriceWithoutLandResponse landPrice;
     private List<BusinessType> businessTypes;
+    
 }

@@ -85,7 +85,7 @@ public class TransactionServiceImpl implements TransactionService {
                 .surveyStatus(SurveyStatus.PENDING)
                 .verifyStatus(Verify.PENDING)
                 .paymentStatus(Payment.UNPAID)
-                .transactionStatus(TrxStatus.PENDING)
+                .transactionStatus(TrxStatus.ON_PROGRESS)
                 .customer(customer)
                 .rentPeriod(rentPeriod)
                 .landPrice(landPrice)
@@ -121,33 +121,64 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public void dealTransaction(String id) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void payTransaction(String id) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void surveyTransaction(String id, TransactionChangeStatusRequest request) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
     public TransactionResponse verifyApproveTransaction(String id, TransactionChangeStatusRequest request) {
-        // TODO Auto-generated method stub
-        return null;
+        Transaction transaction = getById(id);
+        Admin admin = adminService.getById(request.getAdminId());
+
+        transaction.setVerifyStatus(Verify.APPROVED);
+        transaction.setVerifiedBy(admin);
+        transactionRepository.saveAndFlush(transaction);
+
+        return convertToTransactionResponse(transaction);
     }
 
     @Override
     public TransactionResponse verifyRejectTransaction(String id, TransactionChangeStatusRequest request) {
-        // TODO Auto-generated method stub
-        return null;
+        Transaction transaction = getById(id);
+        Admin admin = adminService.getById(request.getAdminId());
+
+        transaction.setVerifyStatus(Verify.REJECTED);
+        transaction.setVerifiedBy(admin);
+        transaction.setTransactionStatus(TrxStatus.FAILED);
+        transactionRepository.saveAndFlush(transaction);
+
+        return convertToTransactionResponse(transaction);
+    }
+
+    @Override
+    public void doneSurveyLandTransaction(String id) {
+        Transaction transaction = getById(id);
+        transaction.setIsSurveyed(true);
+        transactionRepository.saveAndFlush(transaction);
+    }
+
+    @Override
+    public TransactionResponse acceptTransactionAfterSurveyByCustomer(String id) {
+        Transaction transaction = getById(id);
+        transaction.setSurveyStatus(SurveyStatus.ACCEPTED);
+        transactionRepository.saveAndFlush(transaction);
+
+        return convertToTransactionResponse(transaction);
+    }
+
+    @Override
+    public TransactionResponse declineTransactionAfterSurveyByCustomer(String id) {
+        Transaction transaction = getById(id);
+        transaction.setSurveyStatus(SurveyStatus.DECLINED);
+        transaction.setTransactionStatus(TrxStatus.FAILED);
+        transactionRepository.saveAndFlush(transaction);
+
+        return convertToTransactionResponse(transaction);
+    }
+
+    @Override
+    public TransactionResponse payTransaction(String id) {
+        Transaction transaction = getById(id);
+        transaction.setPaymentStatus(Payment.PAID);
+        transaction.setTransactionStatus(TrxStatus.DONE);
+        transactionRepository.saveAndFlush(transaction);
+
+        return convertToTransactionResponse(transaction);
     }
 
     private TransactionResponse convertToTransactionResponse(Transaction transaction) {

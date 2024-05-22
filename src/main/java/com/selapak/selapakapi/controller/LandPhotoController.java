@@ -5,12 +5,10 @@ import com.selapak.selapakapi.model.request.LandPhotoRequest;
 import com.selapak.selapakapi.model.response.CommonResponse;
 import com.selapak.selapakapi.model.response.LandPhotoResponse;
 import com.selapak.selapakapi.service.LandPhotoService;
-import com.selapak.selapakapi.service.UploadImageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
