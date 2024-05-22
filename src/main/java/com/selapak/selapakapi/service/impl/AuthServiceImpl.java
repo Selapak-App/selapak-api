@@ -2,6 +2,7 @@ package com.selapak.selapakapi.service.impl;
 
 import java.time.LocalDateTime;
 
+import com.selapak.selapakapi.exception.ApplicationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -75,7 +76,7 @@ public class AuthServiceImpl implements AuthService {
                     .role(userCredential.getRole().getName())
                     .build();
         } catch (DataIntegrityViolationException e) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "User already exists");
+            throw new ApplicationException("Data Request Conflict", "Email Sudah Terdaftar", HttpStatus.CONFLICT);
         }
     }
 
@@ -105,7 +106,7 @@ public class AuthServiceImpl implements AuthService {
                     .role(userCredential.getRole().getName())
                     .build();
         } catch (DataIntegrityViolationException e) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "User already exists");
+            throw new ApplicationException("Data Request Conflict", "Email Sudah Terdaftar", HttpStatus.CONFLICT);
         }
     }
 
@@ -138,7 +139,7 @@ public class AuthServiceImpl implements AuthService {
                     .role(userCredential.getRole().getName())
                     .build();
         } catch (DataIntegrityViolationException e) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "User already exists");
+            throw new ApplicationException("Data Request Conflict", "Email Sudah Terdaftar", HttpStatus.CONFLICT);
         }
     }
 
