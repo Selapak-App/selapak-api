@@ -114,6 +114,16 @@ public class LandServiceImpl implements LandService {
     }
 
     @Override
+    public List<LandResponse> getAllLandAvailable() {
+        List<Land> lands = landRepository.findAll();
+        List<LandResponse> landResponses = lands.stream()
+                .filter(land -> land.getSlotAvailable() > 0)
+                .map(this::convertToLandResponse)
+                .toList();
+        return landResponses;
+    }
+
+    @Override
     @Transactional(rollbackOn = Exception.class)
     public LandResponse updateById(String id, LandRequest request) {
         Land existingLand = getById(id);

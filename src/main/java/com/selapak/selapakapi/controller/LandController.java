@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(AppPath.LAND_PATH)
@@ -88,6 +90,18 @@ public class LandController {
         CommonResponse<LandResponse> response = CommonResponse.<LandResponse>builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("Delete land successfully.")
+                .build();
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping(AppPath.AVAILABLE)
+    public ResponseEntity<?> getLandAvailable() {
+        List<LandResponse> landResponse = landService.getAllLandAvailable();
+        CommonResponse<List<LandResponse>> response = CommonResponse.<List<LandResponse>>builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("Get land available successfully.")
+                .data(landResponse)
                 .build();
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
