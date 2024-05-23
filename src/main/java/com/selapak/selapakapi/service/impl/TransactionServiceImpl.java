@@ -2,6 +2,7 @@ package com.selapak.selapakapi.service.impl;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -118,6 +119,16 @@ public class TransactionServiceImpl implements TransactionService {
     public List<Transaction> getAll() {
         List<Transaction> transactions = transactionRepository.findAll();
         return transactions;
+    }
+
+    @Override
+    public List<TransactionResponse> getAllByCustomerId(String customerId) {
+        List<Transaction> transactions = transactionRepository.findAll();
+        List<TransactionResponse> transactionResponses = transactions.stream()
+                .filter(transaction -> transaction.getCustomer().getId().equals(customerId))
+                .map(this::convertToTransactionResponse)
+                .collect(Collectors.toList());
+        return transactionResponses;
     }
 
     @Override
@@ -281,5 +292,4 @@ public class TransactionServiceImpl implements TransactionService {
                 .isActive(transaction.getIsActive())
                 .build();
     }
-
 }

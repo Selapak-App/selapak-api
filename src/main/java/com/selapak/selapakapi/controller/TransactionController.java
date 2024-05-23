@@ -24,6 +24,8 @@ import com.selapak.selapakapi.service.TransactionService;
 
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(AppPath.TRANSACTION_PATH)
@@ -154,6 +156,18 @@ public class TransactionController {
                 .build();
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping(AppPath.CUSTOMER_BY_ID)
+    public ResponseEntity<?> getAllByCustomer(@PathVariable String customerId){
+        List<TransactionResponse> transactionResponses = transactionService.getAllByCustomerId(customerId);
+        CommonResponse<List<TransactionResponse>> response = CommonResponse.<List<TransactionResponse>>builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("Get transaction by customer id successfully.")
+                .data(transactionResponses)
+                .build();
+
+        return ResponseEntity.status(HttpStatus.OK.value()).body(response);
     }
 
 }
