@@ -10,12 +10,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(toBuilder = true)
-public class AdminResponse {
-
+public class AllAdminResponse {
     private String id;
     private String name;
     private String email;
     private Boolean isActive;
-
-    
+    private AdminStatus status;
 }
