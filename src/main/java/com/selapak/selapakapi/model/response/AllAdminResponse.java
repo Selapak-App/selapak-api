@@ -15,5 +15,5 @@ public class AllAdminResponse {
     private String name;
     private String email;
     private Boolean isActive;
-    private AdminStatus status;
+    private String status;
 }

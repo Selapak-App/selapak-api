@@ -38,7 +38,7 @@ public class AdminServiceImpl implements AdminService {
     public Page<AllAdminResponse> getAll(Integer page, Integer size) {
         Page<Admin> adminPage = adminRepository.findAll(PageRequest.of(page,size));
         Page<AllAdminResponse> adminResponses = adminPage.map(admin -> {
-            AdminStatus status = admin.getIsActive() ? AdminStatus.ACTIVE : AdminStatus.DEACTIVE;
+            String status = admin.getIsActive() ? "INACTIVE" : "DEACTIVE";
             return AllAdminResponse.builder()
                     .id(admin.getId())
                     .name(admin.getName())
@@ -59,7 +59,7 @@ public class AdminServiceImpl implements AdminService {
                 .build();
         adminRepository.save(updateAdmin);
 
-        AdminStatus status = updateAdmin.getIsActive() ? AdminStatus.ACTIVE : AdminStatus.DEACTIVE;
+        String status = updateAdmin.getIsActive() ? "INACTIVE" : "DEACTIVE";
         return AllAdminResponse.builder()
                 .id(updateAdmin.getId())
                 .name(updateAdmin.getName())
@@ -77,7 +77,7 @@ public class AdminServiceImpl implements AdminService {
                 .build();
         adminRepository.save(updateAdmin);
 
-        AdminStatus status = updateAdmin.getIsActive() ? AdminStatus.ACTIVE : AdminStatus.DEACTIVE;
+        String status = updateAdmin.getIsActive() ? "INACTIVE" : "DEACTIVE";
         return AllAdminResponse.builder()
                 .id(updateAdmin.getId())
                 .name(updateAdmin.getName())
