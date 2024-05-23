@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class LandPriceUpdateRequest {
+    
     private String landId;
     private Long price;
     private Land land;

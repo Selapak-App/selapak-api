@@ -10,7 +10,6 @@ import com.selapak.selapakapi.repository.LandPhotoRepository;
 import com.selapak.selapakapi.service.LandPhotoService;
 import com.selapak.selapakapi.service.LandService;
 import com.selapak.selapakapi.service.UploadImageService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;

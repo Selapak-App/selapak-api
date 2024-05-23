@@ -1,7 +1,6 @@
 package com.selapak.selapakapi.service;
 
 import com.selapak.selapakapi.model.entity.Land;
-import com.selapak.selapakapi.model.entity.LandPhoto;
 import com.selapak.selapakapi.model.request.LandPhotoRequest;
 import com.selapak.selapakapi.model.request.LandRequest;
 import com.selapak.selapakapi.model.response.LandPhotoResponse;

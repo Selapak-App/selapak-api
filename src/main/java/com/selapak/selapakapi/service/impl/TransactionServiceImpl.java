@@ -1,9 +1,13 @@
 package com.selapak.selapakapi.service.impl;
 
 import java.time.Instant;
+import java.util.List;
+import java.util.stream.Collectors;
 
+import com.selapak.selapakapi.exception.ApplicationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.selapak.selapakapi.constant.Payment;
@@ -18,8 +22,8 @@ import com.selapak.selapakapi.model.entity.Customer;
 import com.selapak.selapakapi.model.entity.LandPrice;
 import com.selapak.selapakapi.model.entity.RentPeriod;
 import com.selapak.selapakapi.model.entity.Transaction;
-import com.selapak.selapakapi.model.request.TransactionChangeStatusRequest;
 import com.selapak.selapakapi.model.request.TransactionRequest;
+import com.selapak.selapakapi.model.request.TransactionVerifyRequest;
 import com.selapak.selapakapi.model.response.AdminResponse;
 import com.selapak.selapakapi.model.response.BusinessResponse;
 import com.selapak.selapakapi.model.response.CustomerResponse;
@@ -67,6 +71,12 @@ public class TransactionServiceImpl implements TransactionService {
         LandPrice landPrice = landPriceService.getById(request.getLandPriceId());
         BusinessType businessType = businessTypeService.getById(request.getBusinessType());
 
+        String landId = landPrice.getLand().getId();
+        int availableSlots = landService.getAvailableSlots(landId);
+        if (availableSlots <= 0) {
+            throw new ApplicationException("Not Found", "Land Tidak Ditemukan", HttpStatus.NOT_FOUND);
+        }
+
         Business business = Business.builder()
                 .businessName(request.getBusinessName())
                 .description(request.getBusinessDescription())
@@ -85,7 +95,7 @@ public class TransactionServiceImpl implements TransactionService {
                 .surveyStatus(SurveyStatus.PENDING)
                 .verifyStatus(Verify.PENDING)
                 .paymentStatus(Payment.UNPAID)
-                .transactionStatus(TrxStatus.PENDING)
+                .transactionStatus(TrxStatus.ON_PROGRESS)
                 .customer(customer)
                 .rentPeriod(rentPeriod)
                 .landPrice(landPrice)
@@ -93,7 +103,6 @@ public class TransactionServiceImpl implements TransactionService {
                 .build();
         transactionRepository.saveAndFlush(transaction);
 
-        String landId = landPrice.getLand().getId();
         landService.decreaseLandSlotAvailable(landId, request.getQuantity());
 
         return convertToTransactionResponse(transaction);
@@ -114,6 +123,22 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
+    public List<Transaction> getAll() {
+        List<Transaction> transactions = transactionRepository.findAll();
+        return transactions;
+    }
+
+    @Override
+    public List<TransactionResponse> getAllByCustomerId(String customerId) {
+        List<Transaction> transactions = transactionRepository.findAll();
+        List<TransactionResponse> transactionResponses = transactions.stream()
+                .filter(transaction -> transaction.getCustomer().getId().equals(customerId))
+                .map(this::convertToTransactionResponse)
+                .collect(Collectors.toList());
+        return transactionResponses;
+    }
+
+    @Override
     public void deleteById(String id) {
         Transaction transaction = getById(id);
         transaction.setIsActive(false);
@@ -121,33 +146,70 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public void dealTransaction(String id) {
-        // TODO Auto-generated method stub
+    public TransactionResponse verifyApproveTransaction(String id, TransactionVerifyRequest request) {
+        Transaction transaction = getById(id);
+        Admin admin = adminService.getById(request.getAdminId());
 
+        transaction.setVerifyStatus(Verify.APPROVED);
+        transaction.setVerifiedBy(admin);
+        transaction.setUpdatedAt(Instant.now().toEpochMilli());
+        transactionRepository.saveAndFlush(transaction);
+
+        return convertToTransactionResponse(transaction);
     }
 
     @Override
-    public void payTransaction(String id) {
-        // TODO Auto-generated method stub
+    public TransactionResponse verifyRejectTransaction(String id, TransactionVerifyRequest request) {
+        Transaction transaction = getById(id);
+        Admin admin = adminService.getById(request.getAdminId());
 
+        transaction.setVerifyStatus(Verify.REJECTED);
+        transaction.setVerifiedBy(admin);
+        transaction.setUpdatedAt(Instant.now().toEpochMilli());
+        transaction.setTransactionStatus(TrxStatus.FAILED);
+        transactionRepository.saveAndFlush(transaction);
+
+        return convertToTransactionResponse(transaction);
     }
 
     @Override
-    public void surveyTransaction(String id, TransactionChangeStatusRequest request) {
-        // TODO Auto-generated method stub
-
+    public void doneSurveyLandTransaction(String id) {
+        Transaction transaction = getById(id);
+        transaction.setIsSurveyed(true);
+        transaction.setUpdatedAt(Instant.now().toEpochMilli());
+        transactionRepository.saveAndFlush(transaction);
     }
 
     @Override
-    public TransactionResponse verifyApproveTransaction(String id, TransactionChangeStatusRequest request) {
-        // TODO Auto-generated method stub
-        return null;
+    public TransactionResponse acceptTransactionAfterSurveyByCustomer(String id) {
+        Transaction transaction = getById(id);
+        transaction.setSurveyStatus(SurveyStatus.ACCEPTED);
+        transaction.setUpdatedAt(Instant.now().toEpochMilli());
+        transactionRepository.saveAndFlush(transaction);
+
+        return convertToTransactionResponse(transaction);
     }
 
     @Override
-    public TransactionResponse verifyRejectTransaction(String id, TransactionChangeStatusRequest request) {
-        // TODO Auto-generated method stub
-        return null;
+    public TransactionResponse declineTransactionAfterSurveyByCustomer(String id) {
+        Transaction transaction = getById(id);
+        transaction.setSurveyStatus(SurveyStatus.DECLINED);
+        transaction.setTransactionStatus(TrxStatus.FAILED);
+        transaction.setUpdatedAt(Instant.now().toEpochMilli());
+        transactionRepository.saveAndFlush(transaction);
+
+        return convertToTransactionResponse(transaction);
+    }
+
+    @Override
+    public TransactionResponse payTransaction(String id) {
+        Transaction transaction = getById(id);
+        transaction.setPaymentStatus(Payment.PAID);
+        transaction.setTransactionStatus(TrxStatus.DONE);
+        transaction.setUpdatedAt(Instant.now().toEpochMilli());
+        transactionRepository.saveAndFlush(transaction);
+
+        return convertToTransactionResponse(transaction);
     }
 
     private TransactionResponse convertToTransactionResponse(Transaction transaction) {
@@ -237,5 +299,4 @@ public class TransactionServiceImpl implements TransactionService {
                 .isActive(transaction.getIsActive())
                 .build();
     }
-
 }

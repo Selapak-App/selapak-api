@@ -6,4 +6,5 @@ public interface UploadImageService {
 
     String uploadImageLand(MultipartFile multipartFile);
     String uploadImageUmkn(MultipartFile multipartFile);
+    
 }

@@ -13,6 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @Builder(toBuilder = true)
 public class LandRequest {
+
     private String landOwnerId;
     private String address;
     private String district;
@@ -26,4 +27,5 @@ public class LandRequest {
     private Long price;
     private List<MultipartFile> landPhotos;
     private List<BusinessTypeRequest> businessTypes;
+    
 }

@@ -1,6 +1,5 @@
 package com.selapak.selapakapi.model.entity;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -45,9 +44,9 @@ public class Customer {
 
     private Boolean isActive;
 
-    private LocalDateTime createdAt;
+    private Long createdAt;
 
-    private LocalDateTime updatedAt;
+    private Long updatedAt;
 
     @OneToOne
     @JoinColumn(name = "user_credential_id", referencedColumnName = "id")

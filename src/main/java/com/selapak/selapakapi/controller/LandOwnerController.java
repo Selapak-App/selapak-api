@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.selapak.selapakapi.constant.AppPath;
 import com.selapak.selapakapi.model.request.LandOwnerRequest;
 import com.selapak.selapakapi.model.response.CommonResponse;
+import com.selapak.selapakapi.model.response.CommonResponseWithPage;
 import com.selapak.selapakapi.model.response.LandOwnerResponse;
+import com.selapak.selapakapi.model.response.PagingResponse;
 import com.selapak.selapakapi.service.LandOwnerService;
 
 import jakarta.validation.Valid;
@@ -43,12 +45,18 @@ public class LandOwnerController {
 
     @GetMapping
     public ResponseEntity<?> getAllLandOwners(@RequestParam(defaultValue = "1") Integer page, 
-            @RequestParam(defaultValue = "10") Integer size) {
+            @RequestParam(defaultValue = "5") Integer size) {
         Page<LandOwnerResponse> landOwnerResponses = landOwnerService.getAllWithDto(page - 1, size);
-        CommonResponse<Page<LandOwnerResponse>> response = CommonResponse.<Page<LandOwnerResponse>>builder()
+        PagingResponse pagingResponse = PagingResponse.builder()
+                .currentPage(page)
+                .totalPage(landOwnerResponses.getTotalPages())
+                .size(size)
+                .build();
+        CommonResponseWithPage<Page<LandOwnerResponse>> response = CommonResponseWithPage.<Page<LandOwnerResponse>>builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("Get all land owners successfully.")
                 .data(landOwnerResponses)
+                .paging(pagingResponse)
                 .build();
 
         return ResponseEntity.status(HttpStatus.OK).body(response);

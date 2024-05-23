@@ -9,9 +9,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(toBuilder = true)
-public class BusinessTypeRequest {
-
-    private String businessTypeId;
-    private String name;
-    
+public class AdminRequest {
+    private String adminId;
 }
