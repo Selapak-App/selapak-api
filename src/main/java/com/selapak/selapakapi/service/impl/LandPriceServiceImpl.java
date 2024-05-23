@@ -1,17 +1,21 @@
 package com.selapak.selapakapi.service.impl;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.selapak.selapakapi.exception.LandPriceNotFoundException;
+import com.selapak.selapakapi.model.entity.LandOwner;
 import com.selapak.selapakapi.model.entity.LandPrice;
 import com.selapak.selapakapi.model.request.LandPriceRequest;
 import com.selapak.selapakapi.model.request.LandPriceUpdateRequest;
+import com.selapak.selapakapi.model.response.LandLessResponse;
+import com.selapak.selapakapi.model.response.LandOwnerResponse;
+import com.selapak.selapakapi.model.response.LandPriceResponse;
 import com.selapak.selapakapi.repository.LandPriceRepository;
 import com.selapak.selapakapi.service.LandPriceService;
 
 import lombok.RequiredArgsConstructor;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -30,34 +34,90 @@ public class LandPriceServiceImpl implements LandPriceService {
     }
 
     @Override
-    public LandPrice createWithDto(LandPriceRequest request) {
+    public LandPrice update(LandPrice landPrice) {
+        return landPriceRepository.saveAndFlush(landPrice);
+    }
+
+    @Override
+    public LandPriceResponse createWithDto(LandPriceRequest request) {
         LandPrice landPrice = LandPrice.builder()
                 .price(request.getPrice())
                 .isActive(true)
                 .build();
-                
-        return landPriceRepository.save(landPrice);
+
+        landPriceRepository.save(landPrice);
+
+        return convertToLandPriceResponse(landPrice);
     }
 
     @Override
-    public LandPrice updateById(LandPriceUpdateRequest request) {
-        LandPrice existingLandPrice = getById(request.getLandId());
-        existingLandPrice = existingLandPrice.toBuilder()
-                .isActive(false)
-                .build();
-        landPriceRepository.saveAndFlush(existingLandPrice);
+    public LandPriceResponse updateById(LandPriceUpdateRequest request) {
+        LandPrice existingLandPrice = landPriceRepository.findById(request.getLandId()).orElse(null);
+
+        if (existingLandPrice != null) {
+            existingLandPrice = existingLandPrice.toBuilder()
+                    .isActive(false)
+                    .build();
+            landPriceRepository.saveAndFlush(existingLandPrice);
+        }
 
         LandPrice newLandPrice = LandPrice.builder()
                 .price(request.getPrice())
-                .land(existingLandPrice.getLand())
+                .land(request.getLand())
                 .isActive(true)
                 .build();
 
-        return landPriceRepository.save(newLandPrice);
+        landPriceRepository.save(newLandPrice);
+
+        return convertToLandPriceResponse(newLandPrice);
     }
 
     @Override
-    public List<LandPrice> getAll() {
-        return landPriceRepository.findAll();
+    public Page<LandPriceResponse> getAll(Integer page, Integer size) {
+        Page<LandPrice> landPrices = landPriceRepository.findAll(PageRequest.of(page, size));
+        
+        return landPrices.map(this::convertToLandPriceResponse);
+    }
+
+    @Override
+    public void deleteById(String id) {
+        LandPrice landPrice = getById(id);
+        landPrice.setIsActive(false);
+        landPriceRepository.saveAndFlush(landPrice);
+    }
+
+    private LandPriceResponse convertToLandPriceResponse(LandPrice landPrice) {
+        LandOwner landOwner = landPrice.getLand().getLandOwner();
+
+        LandOwnerResponse landOwnerResponse = LandOwnerResponse.builder()
+                .id(landOwner.getId())
+                .name(landOwner.getName())
+                .email(landOwner.getEmail())
+                .phoneNumber(landOwner.getPhoneNumber())
+                .nik(landOwner.getNik())
+                .isActive(landOwner.getIsActive())
+                .build();
+
+        LandLessResponse land = LandLessResponse.builder()
+                .id(landPrice.getLand().getId())
+                .landOwner(landOwnerResponse)
+                .address(landPrice.getLand().getAddress())
+                .district(landPrice.getLand().getDistrict())
+                .village(landPrice.getLand().getVillage())
+                .postalCode(landPrice.getLand().getPostalCode())
+                .description(landPrice.getLand().getDescription())
+                .slotArea(landPrice.getLand().getSlotArea())
+                .slotAvailable(landPrice.getLand().getSlotAvailable())
+                .totalSlot(landPrice.getLand().getTotalSlot())
+                .isActive(landPrice.getLand().getIsActive())
+                .build();
+
+
+        return LandPriceResponse.builder()
+                .id(landPrice.getId())
+                .price(landPrice.getPrice())
+                .land(land)
+                .isActive(landPrice.getIsActive())
+                .build();
     }
 }

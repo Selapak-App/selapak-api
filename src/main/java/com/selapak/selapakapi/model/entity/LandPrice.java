@@ -29,9 +29,8 @@ public class LandPrice {
 
     private Boolean isActive;
 
-    @OneToOne
-    @JoinColumn(name = "land_id", referencedColumnName = "id")
-    @JsonBackReference
+    @ManyToOne
+    @JoinColumn(name = "land_id")
     private Land land;
 
     @OneToMany(mappedBy = "landPrice")

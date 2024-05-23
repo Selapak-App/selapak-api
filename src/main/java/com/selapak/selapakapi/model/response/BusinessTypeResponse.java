@@ -1,4 +1,4 @@
-package com.selapak.selapakapi.model.request;
+package com.selapak.selapakapi.model.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,9 +9,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(toBuilder = true)
-public class BusinessTypeRequest {
+public class BusinessTypeResponse {
 
-    private String businessTypeId;
+    private String id;
     private String name;
     
 }

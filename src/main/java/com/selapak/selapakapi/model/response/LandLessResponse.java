@@ -1,19 +1,15 @@
 package com.selapak.selapakapi.model.response;
 
-import com.selapak.selapakapi.model.entity.BusinessType;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(toBuilder = true)
-public class LandResponse {
+public class LandLessResponse {
 
     private String id;
     private LandOwnerResponse landOwner;
@@ -26,8 +22,5 @@ public class LandResponse {
     private Integer slotAvailable;
     private Integer totalSlot;
     private Boolean isActive;
-    private List<LandPhotoResponse> landPhotos;
-    private LandPriceWithoutLandResponse landPrice;
-    private List<BusinessType> businessTypes;
     
 }

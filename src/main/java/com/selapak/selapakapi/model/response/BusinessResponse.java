@@ -6,19 +6,15 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Builder(toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class CustomerResponse {
+@Builder(toBuilder = true)
+public class BusinessResponse {
 
     private String id;
-    private String fullName;
-    private String phoneNumber;
-    private String email;
-    private String address;
-    private String gender;
-    private String nik;
+    private String businessName;
+    private String descripttion;
     private Boolean isActive;
-    private Long updatedAt;
+    private String businessType;
     
 }

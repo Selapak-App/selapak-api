@@ -1,5 +1,6 @@
 package com.selapak.selapakapi.controller;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.selapak.selapakapi.constant.AppPath;
@@ -15,12 +17,13 @@ import com.selapak.selapakapi.model.entity.LandPrice;
 import com.selapak.selapakapi.model.request.LandPriceRequest;
 import com.selapak.selapakapi.model.request.LandPriceUpdateRequest;
 import com.selapak.selapakapi.model.response.CommonResponse;
+import com.selapak.selapakapi.model.response.CommonResponseWithPage;
+import com.selapak.selapakapi.model.response.LandPriceResponse;
+import com.selapak.selapakapi.model.response.PagingResponse;
 import com.selapak.selapakapi.service.LandPriceService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -43,8 +46,8 @@ public class LandPriceController {
 
     @PostMapping
     public ResponseEntity<?> createLandPrice(@Valid @RequestBody LandPriceRequest request) {
-        LandPrice landPrice = landPriceService.createWithDto(request);
-        CommonResponse<LandPrice> response = CommonResponse.<LandPrice>builder()
+        LandPriceResponse landPrice = landPriceService.createWithDto(request);
+        CommonResponse<LandPriceResponse> response = CommonResponse.<LandPriceResponse>builder()
                 .statusCode(HttpStatus.CREATED.value())
                 .message("Create land price successfully.")
                 .data(landPrice)
@@ -55,8 +58,8 @@ public class LandPriceController {
 
     @PutMapping
     public ResponseEntity<?> updateLandPriceById(@Valid @RequestBody LandPriceUpdateRequest request) {
-        LandPrice landPrice = landPriceService.updateById(request);
-        CommonResponse<LandPrice> response = CommonResponse.<LandPrice>builder()
+        LandPriceResponse landPrice = landPriceService.updateById(request);
+        CommonResponse<LandPriceResponse> response = CommonResponse.<LandPriceResponse>builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("Update land price successfully.")
                 .data(landPrice)
@@ -66,12 +69,19 @@ public class LandPriceController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getAllLend() {
-        List<LandPrice> landPrice = landPriceService.getAll();
-        CommonResponse<List<LandPrice>> response = CommonResponse.<List<LandPrice>>builder()
+    public ResponseEntity<?> getAllLandPrices(@RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "5") Integer size) {
+        Page<LandPriceResponse> landPriceResponses = landPriceService.getAll(page - 1, size);
+        PagingResponse pagingResponse = PagingResponse.builder()
+                .currentPage(page)
+                .totalPage(landPriceResponses.getTotalPages())
+                .size(size)
+                .build();
+        CommonResponseWithPage<Page<LandPriceResponse>> response = CommonResponseWithPage.<Page<LandPriceResponse>>builder()
                 .statusCode(HttpStatus.OK.value())
-                .message("Get land price successfully.")
-                .data(landPrice)
+                .message("Get all land prices successfully.")
+                .data(landPriceResponses)
+                .paging(pagingResponse)
                 .build();
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
