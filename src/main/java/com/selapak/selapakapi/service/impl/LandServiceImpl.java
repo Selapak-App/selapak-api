@@ -1,5 +1,6 @@
 package com.selapak.selapakapi.service.impl;
 
+import com.selapak.selapakapi.exception.ApplicationException;
 import com.selapak.selapakapi.exception.LandNotFoundException;
 import com.selapak.selapakapi.model.entity.*;
 import com.selapak.selapakapi.model.request.LandRequest;
@@ -14,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -32,7 +34,7 @@ public class LandServiceImpl implements LandService {
 
     @Override
     public Land getById(String id) {
-        return landRepository.findById(id).orElseThrow(() -> new LandNotFoundException());
+        return landRepository.findById(id).orElseThrow(() -> new ApplicationException("Not Found", "Land Tidak Ditemukan", HttpStatus.NOT_FOUND));
     }
 
     @Override
@@ -93,7 +95,7 @@ public class LandServiceImpl implements LandService {
 
     @Override
     public LandResponse getByIdWithDto(String id) {
-        Land land = getById(id);
+        Land land = this.getById(id);
 
         return convertToLandResponse(land);
     }
@@ -166,8 +168,18 @@ public class LandServiceImpl implements LandService {
     @Override
     public void decreaseLandSlotAvailable(String id, Integer quantity) {
         Land land = getById(id);
-        land.setSlotAvailable(land.getSlotAvailable() - quantity);
+        int newAvailableSlots = land.getSlotAvailable() - quantity;
+        if (newAvailableSlots < 0) {
+            newAvailableSlots = 0;
+        }
+        land.setSlotAvailable(newAvailableSlots);
         landRepository.saveAndFlush(land);
+    }
+
+    @Override
+    public int getAvailableSlots(String landId) {
+        Land land = getById(landId);
+        return land.getSlotAvailable();
     }
 
     private LandResponse convertToLandResponse(Land land) {

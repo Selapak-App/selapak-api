@@ -4,8 +4,10 @@ import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.selapak.selapakapi.exception.ApplicationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.selapak.selapakapi.constant.Payment;
@@ -69,6 +71,12 @@ public class TransactionServiceImpl implements TransactionService {
         LandPrice landPrice = landPriceService.getById(request.getLandPriceId());
         BusinessType businessType = businessTypeService.getById(request.getBusinessType());
 
+        String landId = landPrice.getLand().getId();
+        int availableSlots = landService.getAvailableSlots(landId);
+        if (availableSlots <= 0) {
+            throw new ApplicationException("Not Found", "Land Tidak Ditemukan", HttpStatus.NOT_FOUND);
+        }
+
         Business business = Business.builder()
                 .businessName(request.getBusinessName())
                 .description(request.getBusinessDescription())
@@ -95,7 +103,6 @@ public class TransactionServiceImpl implements TransactionService {
                 .build();
         transactionRepository.saveAndFlush(transaction);
 
-        String landId = landPrice.getLand().getId();
         landService.decreaseLandSlotAvailable(landId, request.getQuantity());
 
         return convertToTransactionResponse(transaction);

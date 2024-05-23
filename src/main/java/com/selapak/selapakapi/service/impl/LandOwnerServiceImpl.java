@@ -1,7 +1,9 @@
 package com.selapak.selapakapi.service.impl;
 
+import com.selapak.selapakapi.exception.ApplicationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.selapak.selapakapi.exception.LandOwnerNotFoundException;
@@ -23,7 +25,7 @@ public class LandOwnerServiceImpl implements LandOwnerService {
 
     @Override
     public LandOwner getById(String id) {
-        return landOwnerRepository.findById(id).orElseThrow(() -> new LandOwnerNotFoundException());
+        return landOwnerRepository.findById(id).orElseThrow(() -> new ApplicationException("Land Owner Tidak Ditemukan", "Land Owner Tidak Ditemukan", HttpStatus.NOT_FOUND));
     }
 
     @Override
