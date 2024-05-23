@@ -24,5 +24,6 @@ public interface LandService {
     void deleteById(String id);
 
     void decreaseLandSlotAvailable(String id, Integer quantity);
+    int getAvailableSlots(String landId);
 
 }
