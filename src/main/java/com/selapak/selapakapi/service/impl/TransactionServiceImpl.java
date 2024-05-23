@@ -1,6 +1,7 @@
 package com.selapak.selapakapi.service.impl;
 
 import java.time.Instant;
+import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -111,6 +112,12 @@ public class TransactionServiceImpl implements TransactionService {
         Page<Transaction> transactions = transactionRepository.findAll(PageRequest.of(page, size));
 
         return transactions.map(this::convertToTransactionResponse);
+    }
+
+    @Override
+    public List<Transaction> getAll() {
+        List<Transaction> transactions = transactionRepository.findAll();
+        return transactions;
     }
 
     @Override

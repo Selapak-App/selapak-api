@@ -106,6 +106,12 @@ public class LandServiceImpl implements LandService {
     }
 
     @Override
+    public List<Land> getAll() {
+        List<Land> lands = landRepository.findAll();
+        return lands;
+    }
+
+    @Override
     @Transactional(rollbackOn = Exception.class)
     public LandResponse updateById(String id, LandRequest request) {
         Land existingLand = getById(id);
