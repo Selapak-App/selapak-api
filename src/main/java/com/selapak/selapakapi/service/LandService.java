@@ -19,6 +19,8 @@ public interface LandService {
     Page<LandResponse> getAll(Integer page, Integer size);
     List<Land> getAll();
 
+    List<LandResponse> getAllLandAvailable();
+
     LandResponse updateById(String id, LandRequest request);
 
     void deleteById(String id);

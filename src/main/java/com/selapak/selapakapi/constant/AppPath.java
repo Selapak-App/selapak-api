@@ -33,5 +33,6 @@ public class AppPath {
     public final static String DEACTIVE_ADMIN = "/deactive/{adminId}";
     public final static String ACTIVE_ADMIN = "/active/{adminId}";
     public final static String DASHBOARD = "/dashboard";
+    public final static String AVAILABLE = "/available";
 
 }
