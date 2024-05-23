@@ -3,6 +3,7 @@ package com.selapak.selapakapi.constant;
 public class AppPath {
 
     public final static String SUPER_ADMIN_PATH = "/api/super-admins";
+    public final static String ADMIN_PATH = "/api/admins";
     public final static String CUSTOMER_PATH = "/api/customers";
     public final static String RENT_PERIOD_PATH = "/api/rent-periods";
     public final static String LAND_OWNER_PATH = "/api/land-owners";
@@ -28,5 +29,8 @@ public class AppPath {
     public final static String TRANSACTION_ACCEPT = "/accept/{transactionId}";
     public final static String TRANSACTION_DECLINE = "/decline/{transactionId}";
     public final static String TRANSACTION_PAY = "/pay/{transactionId}";
+    public final static String DEACTIVE_ADMIN = "/deactive/{adminId}";
+    public final static String ACTIVE_ADMIN = "/active/{adminId}";
+    public final static String DASHBOARD = "/dashboard";
 
 }

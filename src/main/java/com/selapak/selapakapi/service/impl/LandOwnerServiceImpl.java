@@ -13,6 +13,8 @@ import com.selapak.selapakapi.service.LandOwnerService;
 
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class LandOwnerServiceImpl implements LandOwnerService {
@@ -36,6 +38,12 @@ public class LandOwnerServiceImpl implements LandOwnerService {
         Page<LandOwner> landOwners = landOwnerRepository.findAll(PageRequest.of(page, size));
 
         return landOwners.map(this::convertToLandOwnerResponse);
+    }
+
+    @Override
+    public List<LandOwner> getAll() {
+        List<LandOwner> landOwners = landOwnerRepository.findAll();
+        return landOwners;
     }
 
     @Override
