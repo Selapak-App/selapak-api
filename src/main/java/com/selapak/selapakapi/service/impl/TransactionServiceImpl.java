@@ -177,6 +177,11 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public void doneSurveyLandTransaction(String id) {
         Transaction transaction = getById(id);
+
+        if(transaction.getVerifyStatus().equals(Verify.PENDING) || transaction.getVerifyStatus().equals(Verify.REJECTED)){
+            throw new ApplicationException("Transaksi tidak dapat dilanjutkan", "Status verify harus approve dari admin", HttpStatus.CONFLICT);
+        }
+
         transaction.setIsSurveyed(true);
         transaction.setUpdatedAt(Instant.now().toEpochMilli());
         transactionRepository.saveAndFlush(transaction);
@@ -185,6 +190,11 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public TransactionResponse acceptTransactionAfterSurveyByCustomer(String id) {
         Transaction transaction = getById(id);
+
+        if(!transaction.getIsSurveyed()){
+            throw new ApplicationException("Transaksi tidak dapat dilanjutkan", "Customer harus survey terlebih dahulu", HttpStatus.CONFLICT);
+        }
+
         transaction.setSurveyStatus(SurveyStatus.ACCEPTED);
         transaction.setUpdatedAt(Instant.now().toEpochMilli());
         transactionRepository.saveAndFlush(transaction);
@@ -196,6 +206,10 @@ public class TransactionServiceImpl implements TransactionService {
     @Transactional(rollbackOn = Exception.class)
     public TransactionResponse declineTransactionAfterSurveyByCustomer(String id) {
         Transaction transaction = getById(id);
+
+        if(!transaction.getIsSurveyed()){
+            throw new ApplicationException("Transaksi tidak dapat dilanjutkan", "Customer harus survey terlebih dahulu", HttpStatus.CONFLICT);
+        }
 
         Land land = transaction.getLandPrice().getLand();
         int buyQuantity = transaction.getQuantity();
@@ -214,6 +228,11 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public TransactionResponse payTransaction(String id) {
         Transaction transaction = getById(id);
+
+        if(transaction.getSurveyStatus().equals(SurveyStatus.DECLINED)){
+            throw new ApplicationException("Transaksi tidak dapat dilanjutkan", "Customer harus menyetujui untuk melanjutkan transaksi", HttpStatus.CONFLICT);
+        }
+
         transaction.setPaymentStatus(Payment.PAID);
         transaction.setTransactionStatus(TrxStatus.DONE);
         transaction.setUpdatedAt(Instant.now().toEpochMilli());
