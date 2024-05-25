@@ -96,8 +96,8 @@ public class LandController {
     }
 
     @GetMapping(AppPath.AVAILABLE)
-    public ResponseEntity<?> getLandAvailable() {
-        List<LandResponse> landResponse = landService.getAllLandAvailable();
+    public ResponseEntity<?> getLandAvailable(@RequestParam(required = false) Boolean sorted) {
+        List<LandResponse> landResponse = landService.getAllLandAvailable(sorted);
         CommonResponse<List<LandResponse>> response = CommonResponse.<List<LandResponse>>builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("Get land available successfully.")

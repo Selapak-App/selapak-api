@@ -19,7 +19,7 @@ public interface LandService {
     Page<LandResponse> getAll(Integer page, Integer size);
     List<Land> getAll();
 
-    List<LandResponse> getAllLandAvailable();
+    List<LandResponse> getAllLandAvailable(Boolean sortByHighestPrice);
 
     LandResponse updateById(String id, LandRequest request);
 
