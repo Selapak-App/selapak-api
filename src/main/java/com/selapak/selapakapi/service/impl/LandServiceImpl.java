@@ -100,6 +100,11 @@ public class LandServiceImpl implements LandService {
     }
 
     @Override
+    public Land updateSlot(Land land) {
+        return landRepository.save(land);
+    }
+
+    @Override
     public LandResponse getByIdWithDto(String id) {
         Land land = this.getById(id);
 
