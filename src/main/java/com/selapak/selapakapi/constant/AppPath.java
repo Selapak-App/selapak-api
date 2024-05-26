@@ -22,6 +22,7 @@ public class AppPath {
     public final static String GET_BY_ID = "/{id}";
     public final static String UPDATE_BY_ID = "/{id}";
     public final static String DELETE_BY_ID = "/{id}";
+    public final static String CUSTOMER_BY_ID = "/customer/{customerId}";
 
     public final static String TRANSACTION_APPROVE = "/approve/{transactionId}";
     public final static String TRANSACTION_REJECT = "/reject/{transactionId}";
@@ -31,5 +32,7 @@ public class AppPath {
     public final static String TRANSACTION_PAY = "/pay/{transactionId}";
     public final static String DEACTIVE_ADMIN = "/deactive/{adminId}";
     public final static String ACTIVE_ADMIN = "/active/{adminId}";
+    public final static String DASHBOARD = "/dashboard";
+    public final static String AVAILABLE = "/available";
 
 }

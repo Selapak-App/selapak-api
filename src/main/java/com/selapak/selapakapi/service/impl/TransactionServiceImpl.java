@@ -1,9 +1,15 @@
 package com.selapak.selapakapi.service.impl;
 
 import java.time.Instant;
+import java.util.List;
+import java.util.stream.Collectors;
 
+import com.selapak.selapakapi.exception.ApplicationException;
+import com.selapak.selapakapi.model.entity.*;
+import com.selapak.selapakapi.model.request.LandRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.selapak.selapakapi.constant.Payment;
@@ -11,13 +17,6 @@ import com.selapak.selapakapi.constant.SurveyStatus;
 import com.selapak.selapakapi.constant.TrxStatus;
 import com.selapak.selapakapi.constant.Verify;
 import com.selapak.selapakapi.exception.TransactionNotFoundException;
-import com.selapak.selapakapi.model.entity.Admin;
-import com.selapak.selapakapi.model.entity.Business;
-import com.selapak.selapakapi.model.entity.BusinessType;
-import com.selapak.selapakapi.model.entity.Customer;
-import com.selapak.selapakapi.model.entity.LandPrice;
-import com.selapak.selapakapi.model.entity.RentPeriod;
-import com.selapak.selapakapi.model.entity.Transaction;
 import com.selapak.selapakapi.model.request.TransactionRequest;
 import com.selapak.selapakapi.model.request.TransactionVerifyRequest;
 import com.selapak.selapakapi.model.response.AdminResponse;
@@ -67,6 +66,12 @@ public class TransactionServiceImpl implements TransactionService {
         LandPrice landPrice = landPriceService.getById(request.getLandPriceId());
         BusinessType businessType = businessTypeService.getById(request.getBusinessType());
 
+        String landId = landPrice.getLand().getId();
+        int availableSlots = landService.getAvailableSlots(landId);
+        if (availableSlots <= 0) {
+            throw new ApplicationException("Not Found", "Land Tidak Ditemukan", HttpStatus.NOT_FOUND);
+        }
+
         Business business = Business.builder()
                 .businessName(request.getBusinessName())
                 .description(request.getBusinessDescription())
@@ -93,7 +98,6 @@ public class TransactionServiceImpl implements TransactionService {
                 .build();
         transactionRepository.saveAndFlush(transaction);
 
-        String landId = landPrice.getLand().getId();
         landService.decreaseLandSlotAvailable(landId, request.getQuantity());
 
         return convertToTransactionResponse(transaction);
@@ -111,6 +115,22 @@ public class TransactionServiceImpl implements TransactionService {
         Page<Transaction> transactions = transactionRepository.findAll(PageRequest.of(page, size));
 
         return transactions.map(this::convertToTransactionResponse);
+    }
+
+    @Override
+    public List<Transaction> getAll() {
+        List<Transaction> transactions = transactionRepository.findAll();
+        return transactions;
+    }
+
+    @Override
+    public List<TransactionResponse> getAllByCustomerId(String customerId) {
+        List<Transaction> transactions = transactionRepository.findAll();
+        List<TransactionResponse> transactionResponses = transactions.stream()
+                .filter(transaction -> transaction.getCustomer().getId().equals(customerId))
+                .map(this::convertToTransactionResponse)
+                .collect(Collectors.toList());
+        return transactionResponses;
     }
 
     @Override
@@ -134,9 +154,16 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
+    @Transactional(rollbackOn = Exception.class)
     public TransactionResponse verifyRejectTransaction(String id, TransactionVerifyRequest request) {
         Transaction transaction = getById(id);
         Admin admin = adminService.getById(request.getAdminId());
+
+        Land land = transaction.getLandPrice().getLand();
+        int buyQuantity = transaction.getQuantity();
+        int currentSlot = land.getSlotAvailable();
+        land.setSlotAvailable(currentSlot + buyQuantity);
+        landService.updateSlot(land);
 
         transaction.setVerifyStatus(Verify.REJECTED);
         transaction.setVerifiedBy(admin);
@@ -150,6 +177,11 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public void doneSurveyLandTransaction(String id) {
         Transaction transaction = getById(id);
+
+        if(transaction.getVerifyStatus().equals(Verify.PENDING) || transaction.getVerifyStatus().equals(Verify.REJECTED)){
+            throw new ApplicationException("Transaksi tidak dapat dilanjutkan", "Status verify harus approve dari admin", HttpStatus.CONFLICT);
+        }
+
         transaction.setIsSurveyed(true);
         transaction.setUpdatedAt(Instant.now().toEpochMilli());
         transactionRepository.saveAndFlush(transaction);
@@ -158,6 +190,11 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public TransactionResponse acceptTransactionAfterSurveyByCustomer(String id) {
         Transaction transaction = getById(id);
+
+        if(!transaction.getIsSurveyed()){
+            throw new ApplicationException("Transaksi tidak dapat dilanjutkan", "Customer harus survey terlebih dahulu", HttpStatus.CONFLICT);
+        }
+
         transaction.setSurveyStatus(SurveyStatus.ACCEPTED);
         transaction.setUpdatedAt(Instant.now().toEpochMilli());
         transactionRepository.saveAndFlush(transaction);
@@ -166,8 +203,20 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
+    @Transactional(rollbackOn = Exception.class)
     public TransactionResponse declineTransactionAfterSurveyByCustomer(String id) {
         Transaction transaction = getById(id);
+
+        if(!transaction.getIsSurveyed()){
+            throw new ApplicationException("Transaksi tidak dapat dilanjutkan", "Customer harus survey terlebih dahulu", HttpStatus.CONFLICT);
+        }
+
+        Land land = transaction.getLandPrice().getLand();
+        int buyQuantity = transaction.getQuantity();
+        int currentSlot = land.getSlotAvailable();
+        land.setSlotAvailable(currentSlot + buyQuantity);
+        landService.updateSlot(land);
+
         transaction.setSurveyStatus(SurveyStatus.DECLINED);
         transaction.setTransactionStatus(TrxStatus.FAILED);
         transaction.setUpdatedAt(Instant.now().toEpochMilli());
@@ -179,6 +228,11 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public TransactionResponse payTransaction(String id) {
         Transaction transaction = getById(id);
+
+        if(transaction.getSurveyStatus().equals(SurveyStatus.DECLINED)){
+            throw new ApplicationException("Transaksi tidak dapat dilanjutkan", "Customer harus menyetujui untuk melanjutkan transaksi", HttpStatus.CONFLICT);
+        }
+
         transaction.setPaymentStatus(Payment.PAID);
         transaction.setTransactionStatus(TrxStatus.DONE);
         transaction.setUpdatedAt(Instant.now().toEpochMilli());
@@ -274,5 +328,4 @@ public class TransactionServiceImpl implements TransactionService {
                 .isActive(transaction.getIsActive())
                 .build();
     }
-
 }

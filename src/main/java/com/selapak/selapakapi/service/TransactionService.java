@@ -7,6 +7,8 @@ import com.selapak.selapakapi.model.request.TransactionRequest;
 import com.selapak.selapakapi.model.request.TransactionVerifyRequest;
 import com.selapak.selapakapi.model.response.TransactionResponse;
 
+import java.util.List;
+
 public interface TransactionService {
 
     Transaction getById(String id);
@@ -16,6 +18,8 @@ public interface TransactionService {
     TransactionResponse getByIdWithDto(String id);
 
     Page<TransactionResponse> getAllWithDto(Integer page, Integer size);
+    List<Transaction> getAll();
+    List<TransactionResponse> getAllByCustomerId(String customerId);
 
     void deleteById(String id);
 
