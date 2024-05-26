@@ -3,6 +3,8 @@ package com.selapak.selapakapi.service.impl;
 import java.time.Instant;
 
 import com.selapak.selapakapi.exception.ApplicationException;
+import com.selapak.selapakapi.model.request.*;
+import com.selapak.selapakapi.model.response.UpdatePasswordResponse;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,10 +23,6 @@ import com.selapak.selapakapi.model.entity.Customer;
 import com.selapak.selapakapi.model.entity.Role;
 import com.selapak.selapakapi.model.entity.SuperAdmin;
 import com.selapak.selapakapi.model.entity.UserCredential;
-import com.selapak.selapakapi.model.request.LoginRequest;
-import com.selapak.selapakapi.model.request.RegisterAdminRequest;
-import com.selapak.selapakapi.model.request.RegisterCustomerRequest;
-import com.selapak.selapakapi.model.request.RegisterSuperAdminRequest;
 import com.selapak.selapakapi.model.response.LoginResponse;
 import com.selapak.selapakapi.model.response.RegisterResponse;
 import com.selapak.selapakapi.repository.UserCredentialRepository;
@@ -216,4 +214,30 @@ public class AuthServiceImpl implements AuthService {
         return userCredentialRepository.findById(id).orElseThrow(() -> new ApplicationException("User tidak dapat ditemukan", "User tidak ditemukan", HttpStatus.NOT_FOUND));
     }
 
+    @Override
+    @Transactional(rollbackOn = Exception.class)
+    public UpdatePasswordResponse update(String id, UpdatePasswordRequest updatePasswordRequest) {
+        Customer customer = customerService.getById(id);
+        if (customer != null) {
+            String email = customer.getEmail();
+
+            UserCredential userCredentials = userCredentialRepository.findByEmail(email).orElseThrow(
+                    () -> new ApplicationException("Invalid Email", "Email tidak ditemukan", HttpStatus.NOT_FOUND)
+            );
+            if (userCredentials != null) {
+
+                if(!updatePasswordRequest.getNewPassword().equals(updatePasswordRequest.getConfirmNewPassword())){
+                    throw new ApplicationException("Invalid input", "Kata sandi dan konfirmasi kata sandi tidak sama", HttpStatus.CONFLICT);
+                }
+
+                UserCredential updatePass = userCredentials.toBuilder()
+                        .password(passwordEncoder.encode(updatePasswordRequest.getNewPassword()))
+                        .build();
+                userCredentialRepository.save(updatePass);
+            }
+        }
+        return UpdatePasswordResponse.builder()
+                .email(customer.getEmail())
+                .build();
+    }
 }

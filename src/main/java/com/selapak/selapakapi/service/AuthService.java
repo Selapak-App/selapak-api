@@ -1,12 +1,10 @@
 package com.selapak.selapakapi.service;
 
 import com.selapak.selapakapi.model.entity.UserCredential;
-import com.selapak.selapakapi.model.request.LoginRequest;
-import com.selapak.selapakapi.model.request.RegisterAdminRequest;
-import com.selapak.selapakapi.model.request.RegisterCustomerRequest;
-import com.selapak.selapakapi.model.request.RegisterSuperAdminRequest;
+import com.selapak.selapakapi.model.request.*;
 import com.selapak.selapakapi.model.response.LoginResponse;
 import com.selapak.selapakapi.model.response.RegisterResponse;
+import com.selapak.selapakapi.model.response.UpdatePasswordResponse;
 
 public interface AuthService {
 
@@ -21,5 +19,7 @@ public interface AuthService {
     LoginResponse loginAdminAndSuperAdmin(LoginRequest request);
 
     LoginResponse loginCustomer(LoginRequest request);
+
+    UpdatePasswordResponse update (String id, UpdatePasswordRequest updatePasswordRequest);
 
 }
