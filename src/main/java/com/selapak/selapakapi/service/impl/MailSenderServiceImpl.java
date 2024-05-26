@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.Random;
 
@@ -18,6 +19,7 @@ public class MailSenderServiceImpl implements MailSenderService {
 
     private final JavaMailSender javaMailSender;
     private final UserCredentialRepository userCredentialRepository;
+    private final PasswordEncoder passwordEncoder;
     @Override
     public String sendEmail(MailSenderRequest mailSenderRequest) {
         String newPassword = generateRandomPassword();
@@ -27,10 +29,10 @@ public class MailSenderServiceImpl implements MailSenderService {
         );
 
         if (user != null) {
-            user.toBuilder()
-                .password(newPassword)
-                .build();
-            userCredentialRepository.save(user);
+            UserCredential updatePass = user.toBuilder()
+                    .password(passwordEncoder.encode(newPassword))
+                    .build();
+            userCredentialRepository.save(updatePass);
         }
 
         SimpleMailMessage message = new SimpleMailMessage();
