@@ -87,7 +87,10 @@ public class LandServiceImpl implements LandService {
                         .build())
                 .collect(Collectors.toList());
 
-        List<LandPhotoResponse> photoResponses = landPhotoService.create(land, landRequest);
+        List<LandPhotoResponse> photoResponses = new ArrayList<>();
+        if(!landRequest.getLandPhotos().isEmpty()){
+           photoResponses = landPhotoService.create(land, landRequest);
+        }
 
         land.setBusinessRecomendations(businessTypesRecomendation);
         land.setLandPhotos(photoResponses.stream().map(landPhotoResponse -> LandPhoto.builder()
