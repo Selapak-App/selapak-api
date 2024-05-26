@@ -3,9 +3,12 @@ package com.selapak.selapakapi.service.impl;
 import java.time.Instant;
 
 import com.selapak.selapakapi.exception.ApplicationException;
+import com.selapak.selapakapi.model.request.*;
+import com.selapak.selapakapi.model.response.UpdatePasswordResponse;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,10 +23,6 @@ import com.selapak.selapakapi.model.entity.Customer;
 import com.selapak.selapakapi.model.entity.Role;
 import com.selapak.selapakapi.model.entity.SuperAdmin;
 import com.selapak.selapakapi.model.entity.UserCredential;
-import com.selapak.selapakapi.model.request.LoginRequest;
-import com.selapak.selapakapi.model.request.RegisterAdminRequest;
-import com.selapak.selapakapi.model.request.RegisterCustomerRequest;
-import com.selapak.selapakapi.model.request.RegisterSuperAdminRequest;
 import com.selapak.selapakapi.model.response.LoginResponse;
 import com.selapak.selapakapi.model.response.RegisterResponse;
 import com.selapak.selapakapi.repository.UserCredentialRepository;
@@ -144,67 +143,101 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public LoginResponse loginAdminAndSuperAdmin(LoginRequest request) {
-        Authentication authentication = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(
-                request.getEmail().toLowerCase(),
-                request.getPassword()
-            )
-        );
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getEmail().toLowerCase(),
+                            request.getPassword()
+                    )
+            );
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        AppUser appUser = (AppUser) authentication.getPrincipal();
-        String token = jwtUtil.generateToken(appUser);
+            AppUser appUser = (AppUser) authentication.getPrincipal();
+            String token = jwtUtil.generateToken(appUser);
 
-        UserCredential userCredential = getById(appUser.getId());
-    
-        if (appUser.getRole().equals(ERole.ROLE_ADMIN)) {
-            Admin admin = adminService.getById(userCredential.getAdmin().getId());
+            UserCredential userCredential = getById(appUser.getId());
 
-            return LoginResponse.builder()
-                    .id(admin.getId())
-                    .email(appUser.getEmail())
-                    .role(appUser.getRole())
-                    .token(token)
-                    .build();
-        } else {
-            SuperAdmin superAdmin = superAdminService.getById(userCredential.getSuperAdmin().getId());
+            if (appUser.getRole().equals(ERole.ROLE_ADMIN)) {
+                Admin admin = adminService.getById(userCredential.getAdmin().getId());
 
-            return LoginResponse.builder()
-                    .id(superAdmin.getId())
-                    .email(appUser.getEmail())
-                    .role(appUser.getRole())
-                    .token(token)
-                    .build();
+                return LoginResponse.builder()
+                        .id(admin.getId())
+                        .email(appUser.getEmail())
+                        .role(appUser.getRole())
+                        .token(token)
+                        .build();
+            } else {
+                SuperAdmin superAdmin = superAdminService.getById(userCredential.getSuperAdmin().getId());
+
+                return LoginResponse.builder()
+                        .id(superAdmin.getId())
+                        .email(appUser.getEmail())
+                        .role(appUser.getRole())
+                        .token(token)
+                        .build();
+            }
+        }catch (BadCredentialsException e){
+            throw new ApplicationException("Invalid credentials", "Email atau Password Salah", HttpStatus.UNAUTHORIZED);
         }
     }
 
     @Override
     public LoginResponse loginCustomer(LoginRequest request) {
-        Authentication authentication = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(
-                request.getEmail().toLowerCase(),
-                request.getPassword()
-            )
-        );
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getEmail().toLowerCase(),
+                            request.getPassword()
+                    )
+            );
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        AppUser appUser = (AppUser) authentication.getPrincipal();
-        String token = jwtUtil.generateToken(appUser);
+            AppUser appUser = (AppUser) authentication.getPrincipal();
+            String token = jwtUtil.generateToken(appUser);
 
-        UserCredential userCredential = getById(appUser.getId());
-        Customer customer = customerService.getById(userCredential.getCustomer().getId());
+            UserCredential userCredential = getById(appUser.getId());
+            Customer customer = customerService.getById(userCredential.getCustomer().getId());
 
-        return LoginResponse.builder()
-                .id(customer.getId())
-                .email(appUser.getEmail())
-                .role(appUser.getRole())
-                .token(token)
-                .build();
+            return LoginResponse.builder()
+                    .id(customer.getId())
+                    .email(appUser.getEmail())
+                    .role(appUser.getRole())
+                    .token(token)
+                    .build();
+        }catch (BadCredentialsException e){
+            throw new ApplicationException("Invalid credentials", "Email atau Password Salah", HttpStatus.UNAUTHORIZED);
+        }
     }
 
     @Override
     public UserCredential getById(String id) {
-        return userCredentialRepository.findById(id).orElseThrow(() -> new UserCredentialNotFoundException());
+        return userCredentialRepository.findById(id).orElseThrow(() -> new ApplicationException("User tidak dapat ditemukan", "User tidak ditemukan", HttpStatus.NOT_FOUND));
     }
 
+    @Override
+    @Transactional(rollbackOn = Exception.class)
+    public UpdatePasswordResponse update(String id, UpdatePasswordRequest updatePasswordRequest) {
+        Customer customer = customerService.getById(id);
+        if (customer != null) {
+            String email = customer.getEmail();
+
+            UserCredential userCredentials = userCredentialRepository.findByEmail(email).orElseThrow(
+                    () -> new ApplicationException("Invalid Email", "Email tidak ditemukan", HttpStatus.NOT_FOUND)
+            );
+            if (userCredentials != null) {
+
+                if(!updatePasswordRequest.getNewPassword().equals(updatePasswordRequest.getConfirmNewPassword())){
+                    throw new ApplicationException("Invalid input", "Kata sandi dan konfirmasi kata sandi tidak sama", HttpStatus.CONFLICT);
+                }
+
+                UserCredential updatePass = userCredentials.toBuilder()
+                        .password(passwordEncoder.encode(updatePasswordRequest.getNewPassword()))
+                        .build();
+                userCredentialRepository.save(updatePass);
+            }
+        }
+        return UpdatePasswordResponse.builder()
+                .email(customer.getEmail())
+                .build();
+    }
 }

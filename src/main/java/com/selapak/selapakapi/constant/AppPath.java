@@ -34,5 +34,7 @@ public class AppPath {
     public final static String ACTIVE_ADMIN = "/active/{adminId}";
     public final static String DASHBOARD = "/dashboard";
     public final static String AVAILABLE = "/available";
+    public final static String SEND_EMAIL = "/send-email";
+    public final static String UPDATE_PASSWORD = "/update-password/{id}";
 
 }
