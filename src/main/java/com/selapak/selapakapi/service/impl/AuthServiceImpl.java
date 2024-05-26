@@ -6,6 +6,7 @@ import com.selapak.selapakapi.exception.ApplicationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -144,67 +145,75 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public LoginResponse loginAdminAndSuperAdmin(LoginRequest request) {
-        Authentication authentication = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(
-                request.getEmail().toLowerCase(),
-                request.getPassword()
-            )
-        );
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getEmail().toLowerCase(),
+                            request.getPassword()
+                    )
+            );
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        AppUser appUser = (AppUser) authentication.getPrincipal();
-        String token = jwtUtil.generateToken(appUser);
+            AppUser appUser = (AppUser) authentication.getPrincipal();
+            String token = jwtUtil.generateToken(appUser);
 
-        UserCredential userCredential = getById(appUser.getId());
-    
-        if (appUser.getRole().equals(ERole.ROLE_ADMIN)) {
-            Admin admin = adminService.getById(userCredential.getAdmin().getId());
+            UserCredential userCredential = getById(appUser.getId());
 
-            return LoginResponse.builder()
-                    .id(admin.getId())
-                    .email(appUser.getEmail())
-                    .role(appUser.getRole())
-                    .token(token)
-                    .build();
-        } else {
-            SuperAdmin superAdmin = superAdminService.getById(userCredential.getSuperAdmin().getId());
+            if (appUser.getRole().equals(ERole.ROLE_ADMIN)) {
+                Admin admin = adminService.getById(userCredential.getAdmin().getId());
 
-            return LoginResponse.builder()
-                    .id(superAdmin.getId())
-                    .email(appUser.getEmail())
-                    .role(appUser.getRole())
-                    .token(token)
-                    .build();
+                return LoginResponse.builder()
+                        .id(admin.getId())
+                        .email(appUser.getEmail())
+                        .role(appUser.getRole())
+                        .token(token)
+                        .build();
+            } else {
+                SuperAdmin superAdmin = superAdminService.getById(userCredential.getSuperAdmin().getId());
+
+                return LoginResponse.builder()
+                        .id(superAdmin.getId())
+                        .email(appUser.getEmail())
+                        .role(appUser.getRole())
+                        .token(token)
+                        .build();
+            }
+        }catch (BadCredentialsException e){
+            throw new ApplicationException("Invalid credentials", "Email atau Password Salah", HttpStatus.UNAUTHORIZED);
         }
     }
 
     @Override
     public LoginResponse loginCustomer(LoginRequest request) {
-        Authentication authentication = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(
-                request.getEmail().toLowerCase(),
-                request.getPassword()
-            )
-        );
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getEmail().toLowerCase(),
+                            request.getPassword()
+                    )
+            );
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        AppUser appUser = (AppUser) authentication.getPrincipal();
-        String token = jwtUtil.generateToken(appUser);
+            AppUser appUser = (AppUser) authentication.getPrincipal();
+            String token = jwtUtil.generateToken(appUser);
 
-        UserCredential userCredential = getById(appUser.getId());
-        Customer customer = customerService.getById(userCredential.getCustomer().getId());
+            UserCredential userCredential = getById(appUser.getId());
+            Customer customer = customerService.getById(userCredential.getCustomer().getId());
 
-        return LoginResponse.builder()
-                .id(customer.getId())
-                .email(appUser.getEmail())
-                .role(appUser.getRole())
-                .token(token)
-                .build();
+            return LoginResponse.builder()
+                    .id(customer.getId())
+                    .email(appUser.getEmail())
+                    .role(appUser.getRole())
+                    .token(token)
+                    .build();
+        }catch (BadCredentialsException e){
+            throw new ApplicationException("Invalid credentials", "Email atau Password Salah", HttpStatus.UNAUTHORIZED);
+        }
     }
 
     @Override
     public UserCredential getById(String id) {
-        return userCredentialRepository.findById(id).orElseThrow(() -> new UserCredentialNotFoundException());
+        return userCredentialRepository.findById(id).orElseThrow(() -> new ApplicationException("User tidak dapat ditemukan", "User tidak ditemukan", HttpStatus.NOT_FOUND));
     }
 
 }
