@@ -1,6 +1,7 @@
 package com.selapak.selapakapi.service.impl;
 
 import java.time.Instant;
+import java.util.List;
 
 import com.selapak.selapakapi.exception.ApplicationException;
 import org.springframework.data.domain.Page;
@@ -38,6 +39,11 @@ public class CustomerServiceImpl implements CustomerService {
         Page<Customer> customers = customerRepository.findAll(PageRequest.of(page,size));
 
         return customers.map(this::convertToCustomerResponse);
+    }
+
+    @Override
+    public List<Customer> getAll() {
+        return customerRepository.findAll();
     }
 
     @Override
