@@ -211,7 +211,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public UserCredential getById(String id) {
-        return userCredentialRepository.findById(id).orElseThrow(() -> new ApplicationException("User tidak dapat ditemukan", "User tidak ditemukan", HttpStatus.NOT_FOUND));
+        return userCredentialRepository.findById(id).orElseThrow(() -> new ApplicationException("Data user request not found", "User tidak ditemukan", HttpStatus.NOT_FOUND));
     }
 
     @Override
@@ -222,12 +222,12 @@ public class AuthServiceImpl implements AuthService {
             String email = customer.getEmail();
 
             UserCredential userCredentials = userCredentialRepository.findByEmail(email).orElseThrow(
-                    () -> new ApplicationException("Invalid Email", "Email tidak ditemukan", HttpStatus.NOT_FOUND)
+                    () -> new ApplicationException("Data email request not found", "Email tidak ditemukan", HttpStatus.NOT_FOUND)
             );
             if (userCredentials != null) {
 
                 if(!updatePasswordRequest.getNewPassword().equals(updatePasswordRequest.getConfirmNewPassword())){
-                    throw new ApplicationException("Invalid input", "Kata sandi dan konfirmasi kata sandi tidak sama", HttpStatus.CONFLICT);
+                    throw new ApplicationException("Data request conflict", "Kata sandi dan konfirmasi kata sandi tidak sama", HttpStatus.CONFLICT);
                 }
 
                 UserCredential updatePass = userCredentials.toBuilder()

@@ -55,7 +55,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public Transaction getById(String id) {
-        return transactionRepository.findById(id).orElseThrow(() -> new TransactionNotFoundException());
+        return transactionRepository.findById(id).orElseThrow(() -> new ApplicationException("Data transaction not found", "Transaction tidak ditemukan", HttpStatus.NOT_FOUND));
     }
 
     @Override
@@ -69,7 +69,7 @@ public class TransactionServiceImpl implements TransactionService {
         String landId = landPrice.getLand().getId();
         int availableSlots = landService.getAvailableSlots(landId);
         if (availableSlots <= 0) {
-            throw new ApplicationException("Not Found", "Land Tidak Ditemukan", HttpStatus.NOT_FOUND);
+            throw new ApplicationException("Data land slot not found", "Lapak tidak ditemukan", HttpStatus.NOT_FOUND);
         }
 
         Business business = Business.builder()
@@ -179,7 +179,7 @@ public class TransactionServiceImpl implements TransactionService {
         Transaction transaction = getById(id);
 
         if(transaction.getVerifyStatus().equals(Verify.PENDING) || transaction.getVerifyStatus().equals(Verify.REJECTED)){
-            throw new ApplicationException("Transaksi tidak dapat dilanjutkan", "Status verify harus approve dari admin", HttpStatus.CONFLICT);
+            throw new ApplicationException("Data done survey request conflict", "Status verify harus approve dari admin", HttpStatus.CONFLICT);
         }
 
         transaction.setIsSurveyed(true);
@@ -192,7 +192,7 @@ public class TransactionServiceImpl implements TransactionService {
         Transaction transaction = getById(id);
 
         if(!transaction.getIsSurveyed()){
-            throw new ApplicationException("Transaksi tidak dapat dilanjutkan", "Customer harus survey terlebih dahulu", HttpStatus.CONFLICT);
+            throw new ApplicationException("Data accept transaction request conflict", "Customer harus survey terlebih dahulu", HttpStatus.CONFLICT);
         }
 
         transaction.setSurveyStatus(SurveyStatus.ACCEPTED);
@@ -208,7 +208,7 @@ public class TransactionServiceImpl implements TransactionService {
         Transaction transaction = getById(id);
 
         if(!transaction.getIsSurveyed()){
-            throw new ApplicationException("Transaksi tidak dapat dilanjutkan", "Customer harus survey terlebih dahulu", HttpStatus.CONFLICT);
+            throw new ApplicationException("Data decline transaction request conflict", "Customer harus survey terlebih dahulu", HttpStatus.CONFLICT);
         }
 
         Land land = transaction.getLandPrice().getLand();
@@ -230,7 +230,7 @@ public class TransactionServiceImpl implements TransactionService {
         Transaction transaction = getById(id);
 
         if(transaction.getSurveyStatus().equals(SurveyStatus.DECLINED)){
-            throw new ApplicationException("Transaksi tidak dapat dilanjutkan", "Customer harus menyetujui untuk melanjutkan transaksi", HttpStatus.CONFLICT);
+            throw new ApplicationException("Data payment request conflict", "Customer harus menyetujui untuk melanjutkan transaksi", HttpStatus.CONFLICT);
         }
 
         transaction.setPaymentStatus(Payment.PAID);
