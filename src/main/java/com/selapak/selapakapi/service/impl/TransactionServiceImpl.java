@@ -70,7 +70,7 @@ public class TransactionServiceImpl implements TransactionService {
         int availableSlots = landService.getAvailableSlots(landId);
 
         if(availableSlots < request.getQuantity() || availableSlots <= 0){
-            throw new ApplicationException("Data request conflict", "Transaksi tidak dapat dilakukan", HttpStatus.BAD_REQUEST);
+            throw new ApplicationException("Data bad request", "Transaksi tidak dapat dilakukan", HttpStatus.BAD_REQUEST);
         }
 
         Business business = Business.builder()
