@@ -19,6 +19,7 @@ public interface TransactionService {
 
     Page<TransactionResponse> getAllWithDto(Integer page, Integer size);
     List<Transaction> getAll();
+    List<TransactionResponse> getAllByCustomerId(String customerId);
 
     void deleteById(String id);
 

@@ -1,6 +1,6 @@
 package com.selapak.selapakapi.service.impl;
 
-import com.selapak.selapakapi.exception.LandNotFoundException;
+import com.selapak.selapakapi.exception.ApplicationException;
 import com.selapak.selapakapi.model.entity.*;
 import com.selapak.selapakapi.model.request.LandRequest;
 import com.selapak.selapakapi.model.response.LandOwnerResponse;
@@ -9,11 +9,15 @@ import com.selapak.selapakapi.model.response.LandPriceWithoutLandResponse;
 import com.selapak.selapakapi.model.response.LandResponse;
 import com.selapak.selapakapi.repository.LandRepository;
 import com.selapak.selapakapi.service.*;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -32,13 +36,17 @@ public class LandServiceImpl implements LandService {
 
     @Override
     public Land getById(String id) {
-        return landRepository.findById(id).orElseThrow(() -> new LandNotFoundException());
+        return landRepository.findById(id).orElseThrow(() -> new ApplicationException("Data land request not found", "Lapak tidak ditemukan", HttpStatus.NOT_FOUND));
     }
 
     @Override
     @Transactional(rollbackOn = Exception.class)
     public LandResponse create(LandRequest landRequest) {
         LandOwner landOwner = landOwnerService.getById(landRequest.getLandOwnerId());
+
+        if(landRequest.getSlotAvailable() > landRequest.getTotalSlot()){
+            throw new ApplicationException("Data land request conflict", "slot tersedia tidak boleh lebih besar dari total slot", HttpStatus.CONFLICT);
+        }
 
         Land land = Land.builder()
                 .landOwner(landOwner)
@@ -79,7 +87,10 @@ public class LandServiceImpl implements LandService {
                         .build())
                 .collect(Collectors.toList());
 
-        List<LandPhotoResponse> photoResponses = landPhotoService.create(land, landRequest);
+        List<LandPhotoResponse> photoResponses = new ArrayList<>();
+        if(!landRequest.getLandPhotos().isEmpty()){
+           photoResponses = landPhotoService.create(land, landRequest);
+        }
 
         land.setBusinessRecomendations(businessTypesRecomendation);
         land.setLandPhotos(photoResponses.stream().map(landPhotoResponse -> LandPhoto.builder()
@@ -92,8 +103,13 @@ public class LandServiceImpl implements LandService {
     }
 
     @Override
+    public Land updateSlot(Land land) {
+        return landRepository.save(land);
+    }
+
+    @Override
     public LandResponse getByIdWithDto(String id) {
-        Land land = getById(id);
+        Land land = this.getById(id);
 
         return convertToLandResponse(land);
     }
@@ -107,8 +123,37 @@ public class LandServiceImpl implements LandService {
 
     @Override
     public List<Land> getAll() {
-        List<Land> lands = landRepository.findAll();
-        return lands;
+        return landRepository.findAll();
+    }
+
+    public static Specification<Land> withAvailableSlots() {
+        return (root, query, criteriaBuilder) -> criteriaBuilder.greaterThan(root.get("slotAvailable"), 0);
+    }
+
+    public static Specification<Land> sortByPrice(Boolean ascending) {
+        return (root, query, criteriaBuilder) -> {
+            Join<Land, LandPrice> landPriceJoin = root.join("landPrices", JoinType.INNER);
+            if(ascending != null){
+                query.orderBy(ascending ? criteriaBuilder.asc(landPriceJoin.get("price")) : criteriaBuilder.desc(landPriceJoin.get("price")));
+            }
+            return criteriaBuilder.conjunction();
+        };
+    }
+
+    @Override
+    public List<LandResponse> getAllLandAvailable(Boolean sortByHighestPrice) {
+        Specification<Land> availabilitySpec = withAvailableSlots();
+
+        if (sortByHighestPrice != null) {
+            Specification<Land> priceSpec = sortByPrice(sortByHighestPrice);
+            availabilitySpec = availabilitySpec.and(priceSpec);
+        }
+
+        List<Land> lands = landRepository.findAll(availabilitySpec);
+
+        return lands.stream()
+                .map(this::convertToLandResponse)
+                .toList();
     }
 
     @Override
@@ -166,8 +211,18 @@ public class LandServiceImpl implements LandService {
     @Override
     public void decreaseLandSlotAvailable(String id, Integer quantity) {
         Land land = getById(id);
-        land.setSlotAvailable(land.getSlotAvailable() - quantity);
+        int newAvailableSlots = land.getSlotAvailable() - quantity;
+        if (newAvailableSlots < 0) {
+            newAvailableSlots = 0;
+        }
+        land.setSlotAvailable(newAvailableSlots);
         landRepository.saveAndFlush(land);
+    }
+
+    @Override
+    public int getAvailableSlots(String landId) {
+        Land land = getById(landId);
+        return land.getSlotAvailable();
     }
 
     private LandResponse convertToLandResponse(Land land) {

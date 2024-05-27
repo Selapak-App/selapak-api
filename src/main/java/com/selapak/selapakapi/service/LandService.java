@@ -13,16 +13,20 @@ public interface LandService {
     Land getById(String id);
 
     LandResponse create(LandRequest landRequest);
+    Land updateSlot(Land land);
 
     LandResponse getByIdWithDto(String id);
 
     Page<LandResponse> getAll(Integer page, Integer size);
     List<Land> getAll();
 
+    List<LandResponse> getAllLandAvailable(Boolean sortByHighestPrice);
+
     LandResponse updateById(String id, LandRequest request);
 
     void deleteById(String id);
 
     void decreaseLandSlotAvailable(String id, Integer quantity);
+    int getAvailableSlots(String landId);
 
 }

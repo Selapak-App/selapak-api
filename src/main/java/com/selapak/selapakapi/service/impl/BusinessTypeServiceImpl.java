@@ -2,6 +2,8 @@ package com.selapak.selapakapi.service.impl;
 
 import java.util.List;
 
+import com.selapak.selapakapi.exception.ApplicationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.selapak.selapakapi.exception.BusinessTypeNotFoundException;
@@ -39,7 +41,7 @@ public class BusinessTypeServiceImpl implements BusinessTypeService {
 
     @Override
     public BusinessType getById(String id) {
-        return businessTypeRepository.findById(id).orElseThrow(() -> new BusinessTypeNotFoundException());
+        return businessTypeRepository.findById(id).orElseThrow(() -> new ApplicationException("Data business type request not found", "Data tipe bisnis tidak ditemukan", HttpStatus.NOT_FOUND));
     }
 
 }
