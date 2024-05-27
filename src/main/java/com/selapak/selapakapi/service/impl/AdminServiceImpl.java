@@ -27,11 +27,11 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public Admin getById(String id) {
-        return adminRepository.findByIdAndIsActive(id, true).orElseThrow(() -> new ApplicationException("Data Admin Tidak Ditemukan", "Data Admin Tidak Ditemukan", HttpStatus.NOT_FOUND));
+        return adminRepository.findByIdAndIsActive(id, true).orElseThrow(() -> new ApplicationException("Data admin request not found", "Data Admin Tidak Ditemukan", HttpStatus.NOT_FOUND));
     }
 
     public Admin getByIdDeactive(String id){
-        return adminRepository.findByIdAndIsActive(id, false).orElseThrow(() -> new ApplicationException("Data Admin Tidak Ditemukan", "Data Admin Tidak Ditemukan", HttpStatus.NOT_FOUND));
+        return adminRepository.findByIdAndIsActive(id, false).orElseThrow(() -> new ApplicationException("Data admin request not found", "Data Admin Tidak Ditemukan", HttpStatus.NOT_FOUND));
     }
 
     @Override

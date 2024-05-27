@@ -28,7 +28,7 @@ public class UploadImageServiceImpl implements UploadImageService {
                     RequestBody.fromInputStream(multipartFile.getInputStream(), multipartFile.getSize()));
             return s3Client.utilities().getUrl(builder -> builder.bucket(bucketName).key(fileName)).toExternalForm();
         } catch (IOException e) {
-            throw new ApplicationException("Gagal", "Gagal upload Foto", HttpStatus.CONFLICT);
+            throw new ApplicationException("Data photo request conflict", "Gagal upload Foto", HttpStatus.CONFLICT);
         }
     }
 
@@ -40,7 +40,7 @@ public class UploadImageServiceImpl implements UploadImageService {
                     RequestBody.fromInputStream(multipartFile.getInputStream(), multipartFile.getSize()));
             return s3Client.utilities().getUrl(builder -> builder.bucket(bucketName).key(fileName)).toExternalForm();
         } catch (IOException e) {
-            throw new ApplicationException("Gagal", "Gagal upload Foto", HttpStatus.CONFLICT);
+            throw new ApplicationException("Data photo request conflict", "Gagal upload Foto", HttpStatus.CONFLICT);
         }
     }
 }

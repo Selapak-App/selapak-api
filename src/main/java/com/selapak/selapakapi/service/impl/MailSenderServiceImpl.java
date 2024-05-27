@@ -25,7 +25,7 @@ public class MailSenderServiceImpl implements MailSenderService {
         String newPassword = generateRandomPassword();
 
         UserCredential user = userCredentialRepository.findByEmail(mailSenderRequest.getEmail()).orElseThrow(
-                () -> new ApplicationException("Invalid Email", "Email tidak ditemukan", HttpStatus.NOT_FOUND)
+                () -> new ApplicationException("Data email request not found", "Email tidak ditemukan", HttpStatus.NOT_FOUND)
         );
 
         if (user != null) {
