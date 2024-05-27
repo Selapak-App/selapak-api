@@ -1,16 +1,12 @@
 package com.selapak.selapakapi.controller;
 
+import com.selapak.selapakapi.model.request.*;
+import com.selapak.selapakapi.model.response.UpdatePasswordResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.selapak.selapakapi.constant.AppPath;
-import com.selapak.selapakapi.model.request.LoginRequest;
-import com.selapak.selapakapi.model.request.RegisterAdminRequest;
-import com.selapak.selapakapi.model.request.RegisterCustomerRequest;
-import com.selapak.selapakapi.model.request.RegisterSuperAdminRequest;
 import com.selapak.selapakapi.model.response.CommonResponse;
 import com.selapak.selapakapi.model.response.LoginResponse;
 import com.selapak.selapakapi.model.response.RegisterResponse;
@@ -81,6 +77,18 @@ public class AuthController {
                 .statusCode(HttpStatus.OK.value())
                 .message("Login successfully.")
                 .data(loginResponse)
+                .build();
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @PutMapping(AppPath.UPDATE_PASSWORD)
+    public ResponseEntity<?> updatePassword(@PathVariable String id, @RequestBody UpdatePasswordRequest request) {
+        UpdatePasswordResponse updateResponse = authService.update(id, request);
+        CommonResponse<UpdatePasswordResponse> response = CommonResponse.<UpdatePasswordResponse>builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("Update successfully.")
+                .data(updateResponse)
                 .build();
 
         return ResponseEntity.status(HttpStatus.OK).body(response);

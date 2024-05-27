@@ -52,7 +52,7 @@ public class LandPhotoServiceImpl implements LandPhotoService {
         }
 
         if(landPhotoList.isEmpty()){
-            throw new ApplicationException("Gagal Menyimpan Foto", "Foto Tidak Dapat Disimpan", HttpStatus.CONFLICT);
+            throw new ApplicationException("Data land photo request conflict", "Foto Tidak Dapat Disimpan", HttpStatus.CONFLICT);
         }
 
         return landPhotoList;

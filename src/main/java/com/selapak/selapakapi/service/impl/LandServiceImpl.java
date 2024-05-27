@@ -36,7 +36,7 @@ public class LandServiceImpl implements LandService {
 
     @Override
     public Land getById(String id) {
-        return landRepository.findById(id).orElseThrow(() -> new ApplicationException("Not Found", "Land Tidak Ditemukan", HttpStatus.NOT_FOUND));
+        return landRepository.findById(id).orElseThrow(() -> new ApplicationException("Data land request not found", "Lapak tidak ditemukan", HttpStatus.NOT_FOUND));
     }
 
     @Override
@@ -45,7 +45,7 @@ public class LandServiceImpl implements LandService {
         LandOwner landOwner = landOwnerService.getById(landRequest.getLandOwnerId());
 
         if(landRequest.getSlotAvailable() > landRequest.getTotalSlot()){
-            throw new ApplicationException("Tidak dapat menambahkan land", "slot tersedia tidak boleh lebih besar dari total slot", HttpStatus.CONFLICT);
+            throw new ApplicationException("Data land request conflict", "slot tersedia tidak boleh lebih besar dari total slot", HttpStatus.CONFLICT);
         }
 
         Land land = Land.builder()
@@ -87,7 +87,10 @@ public class LandServiceImpl implements LandService {
                         .build())
                 .collect(Collectors.toList());
 
-        List<LandPhotoResponse> photoResponses = landPhotoService.create(land, landRequest);
+        List<LandPhotoResponse> photoResponses = new ArrayList<>();
+        if(!landRequest.getLandPhotos().isEmpty()){
+           photoResponses = landPhotoService.create(land, landRequest);
+        }
 
         land.setBusinessRecomendations(businessTypesRecomendation);
         land.setLandPhotos(photoResponses.stream().map(landPhotoResponse -> LandPhoto.builder()
