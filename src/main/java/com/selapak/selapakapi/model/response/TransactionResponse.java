@@ -26,5 +26,6 @@ public class TransactionResponse {
     private Long createdAt;
     private Long updatedAt;
     private Boolean isActive;
+    private Long totalPayment;
     
 }
