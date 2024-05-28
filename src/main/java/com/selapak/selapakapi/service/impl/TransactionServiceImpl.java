@@ -2,6 +2,7 @@ package com.selapak.selapakapi.service.impl;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -10,6 +11,7 @@ import com.selapak.selapakapi.model.entity.*;
 import com.selapak.selapakapi.model.request.LandRequest;
 import com.selapak.selapakapi.model.response.*;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -109,7 +111,12 @@ public class TransactionServiceImpl implements TransactionService {
     public Page<TransactionResponse> getAllWithDto(Integer page, Integer size) {
         Page<Transaction> transactions = transactionRepository.findAll(PageRequest.of(page, size));
 
-        return transactions.map(this::convertToTransactionResponse);
+        List<TransactionResponse> transactionResponses = transactions.getContent().stream()
+                .map(this::convertToTransactionResponse)
+                .sorted(Comparator.comparing(TransactionResponse::getUpdatedAt).reversed())
+                .toList();
+
+        return new PageImpl<>(transactionResponses, transactions.getPageable(), transactions.getTotalElements());
     }
 
     @Override
@@ -122,6 +129,7 @@ public class TransactionServiceImpl implements TransactionService {
         List<Transaction> transactions = getAll();
         return transactions.stream()
                 .filter(transaction -> transaction.getCustomer().getId().equals(customerId))
+                .sorted(Comparator.comparing(Transaction::getUpdatedAt).reversed())
                 .map(this::convertToTransactionResponse)
                 .collect(Collectors.toList());
     }
