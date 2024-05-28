@@ -6,6 +6,8 @@ import com.selapak.selapakapi.model.entity.Customer;
 import com.selapak.selapakapi.model.request.CustomerUpdateRequest;
 import com.selapak.selapakapi.model.response.CustomerResponse;
 
+import java.util.List;
+
 public interface CustomerService {
 
     Customer create(Customer customer);
@@ -21,5 +23,7 @@ public interface CustomerService {
     CustomerResponse updateById(String id, CustomerUpdateRequest request);
 
     void deleteById(String id);
+
+    List<Customer> getAll();
     
 }

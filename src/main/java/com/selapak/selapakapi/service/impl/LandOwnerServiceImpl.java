@@ -25,7 +25,7 @@ public class LandOwnerServiceImpl implements LandOwnerService {
 
     @Override
     public LandOwner getById(String id) {
-        return landOwnerRepository.findById(id).orElseThrow(() -> new ApplicationException("Land Owner Tidak Ditemukan", "Land Owner Tidak Ditemukan", HttpStatus.NOT_FOUND));
+        return landOwnerRepository.findById(id).orElseThrow(() -> new ApplicationException("Data land owner request not found", "Pemilik lahan tidak ditemukan", HttpStatus.NOT_FOUND));
     }
 
     @Override

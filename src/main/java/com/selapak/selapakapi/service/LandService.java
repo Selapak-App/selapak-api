@@ -13,6 +13,7 @@ public interface LandService {
     Land getById(String id);
 
     LandResponse create(LandRequest landRequest);
+    Land updateSlot(Land land);
 
     LandResponse getByIdWithDto(String id);
 

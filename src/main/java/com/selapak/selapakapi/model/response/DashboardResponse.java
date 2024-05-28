@@ -10,7 +10,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder(toBuilder = true)
 public class DashboardResponse {
-    private int totalTransaction;
     private int totalLandOwner;
     private int totalLand;
+    private int totalLandAvailable;
+    private int totalBusinessOwner;
+    private int totalBusiness;
+    private int totalTransactionOnProgress;
+    private int totalTransactionSuccess;
+    private int totalTransactionFail;
+    private int totalTransaction;
 }

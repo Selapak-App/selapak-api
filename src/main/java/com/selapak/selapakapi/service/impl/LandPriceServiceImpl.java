@@ -1,7 +1,9 @@
 package com.selapak.selapakapi.service.impl;
 
+import com.selapak.selapakapi.exception.ApplicationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.selapak.selapakapi.exception.LandPriceNotFoundException;
@@ -30,7 +32,7 @@ public class LandPriceServiceImpl implements LandPriceService {
 
     @Override
     public LandPrice getById(String id) {
-        return landPriceRepository.findById(id).orElseThrow(() -> new LandPriceNotFoundException());
+        return landPriceRepository.findById(id).orElseThrow(() ->new ApplicationException("Data land price request not found", "Harga lapak tidak ditemukan", HttpStatus.NOT_FOUND));
     }
 
     @Override

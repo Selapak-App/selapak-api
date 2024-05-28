@@ -1,5 +1,7 @@
 package com.selapak.selapakapi.service.impl;
 
+import com.selapak.selapakapi.exception.ApplicationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.selapak.selapakapi.exception.SuperAdminNotFoundException;
@@ -22,7 +24,7 @@ public class SuperAdminServiceImpl implements SuperAdminService {
 
     @Override
     public SuperAdmin getById(String id) {
-        return superAdminRepository.findById(id).orElseThrow(() -> new SuperAdminNotFoundException());
+        return superAdminRepository.findById(id).orElseThrow(() -> new ApplicationException("Data super admin request not found", "Data super admin tidak ditemukan", HttpStatus.NOT_FOUND));
     }
 
 }

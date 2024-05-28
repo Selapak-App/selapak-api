@@ -1,9 +1,12 @@
 package com.selapak.selapakapi.service.impl;
 
 import java.time.Instant;
+import java.util.List;
 
+import com.selapak.selapakapi.exception.ApplicationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.selapak.selapakapi.exception.CustomerNotFoundException;
@@ -28,7 +31,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public Customer getById(String id) {
-        return customerRepository.findById(id).orElseThrow(() -> new CustomerNotFoundException());
+        return customerRepository.findById(id).orElseThrow(() -> new ApplicationException("Data customer request not found", "Data pelanggan tidak ditemukan", HttpStatus.NOT_FOUND));
     }
 
     @Override
@@ -36,6 +39,11 @@ public class CustomerServiceImpl implements CustomerService {
         Page<Customer> customers = customerRepository.findAll(PageRequest.of(page,size));
 
         return customers.map(this::convertToCustomerResponse);
+    }
+
+    @Override
+    public List<Customer> getAll() {
+        return customerRepository.findAll();
     }
 
     @Override
@@ -47,7 +55,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public CustomerResponse getByEmailWithDto(String email) {
-        Customer customer = customerRepository.findByEmail(email).orElseThrow(() -> new CustomerNotFoundException());
+        Customer customer = customerRepository.findByEmail(email).orElseThrow(() -> new ApplicationException("Data customer request by email not found", "Data email pelanggan tidak ditemukan", HttpStatus.NOT_FOUND));
 
         return convertToCustomerResponse(customer);
     }
