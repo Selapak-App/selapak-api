@@ -1,5 +1,6 @@
 package com.selapak.selapakapi.service.impl;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -225,8 +226,19 @@ public class TransactionServiceImpl implements TransactionService {
             throw new ApplicationException("Data payment request conflict", "Customer harus menyetujui untuk melanjutkan transaksi", HttpStatus.CONFLICT);
         }
 
-        transaction.setPaymentStatus(Payment.PAID);
-        transaction.setTransactionStatus(TrxStatus.DONE);
+        if(transaction.getPaymentStatus().equals(Payment.UNPAID)){
+            Instant currentTime = Instant.now();
+            Instant oneDayAgo = currentTime.minus(Duration.ofSeconds(86400));
+            Instant transactionTime = Instant.ofEpochMilli(transaction.getUpdatedAt());
+
+            if(transactionTime.isBefore(oneDayAgo)){
+                transaction.setTransactionStatus(TrxStatus.FAILED);
+            }else{
+                transaction.setPaymentStatus(Payment.PAID);
+                transaction.setTransactionStatus(TrxStatus.DONE);
+            }
+        }
+
         transaction.setUpdatedAt(Instant.now().toEpochMilli());
         transactionRepository.saveAndFlush(transaction);
 
