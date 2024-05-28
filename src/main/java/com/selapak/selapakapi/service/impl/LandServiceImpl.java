@@ -161,9 +161,17 @@ public class LandServiceImpl implements LandService {
     public LandResponse updateById(String id, LandRequest request) {
         Land existingLand = getById(id);
         LandOwner landOwner = landOwnerService.getById(request.getLandOwnerId());
+        List<LandPhotoResponse> landPhotos = landPhotoService.getAllPhoto(existingLand.getId());
 
         existingLand = existingLand.toBuilder()
                 .landOwner(landOwner)
+                .landPhotos(landPhotos.stream()
+                        .map(landPhoto ->LandPhoto.builder()
+                                .id(landPhoto.getId())
+                                .imageURL(landPhoto.getImageURL())
+                                .isActive(landPhoto.getIsActive())
+                                .build())
+                        .toList())
                 .address(request.getAddress())
                 .district(request.getDistrict())
                 .village(request.getVillage())
