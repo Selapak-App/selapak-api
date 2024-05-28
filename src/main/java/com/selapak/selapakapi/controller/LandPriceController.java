@@ -70,7 +70,7 @@ public class LandPriceController {
 
     @GetMapping
     public ResponseEntity<?> getAllLandPrices(@RequestParam(defaultValue = "1") Integer page,
-            @RequestParam(defaultValue = "5") Integer size) {
+            @RequestParam(defaultValue = "10") Integer size) {
         Page<LandPriceResponse> landPriceResponses = landPriceService.getAll(page - 1, size);
         PagingResponse pagingResponse = PagingResponse.builder()
                 .currentPage(page)

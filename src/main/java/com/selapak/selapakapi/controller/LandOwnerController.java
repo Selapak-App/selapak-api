@@ -45,7 +45,7 @@ public class LandOwnerController {
 
     @GetMapping
     public ResponseEntity<?> getAllLandOwners(@RequestParam(defaultValue = "1") Integer page, 
-            @RequestParam(defaultValue = "5") Integer size) {
+            @RequestParam(defaultValue = "10") Integer size) {
         Page<LandOwnerResponse> landOwnerResponses = landOwnerService.getAllWithDto(page - 1, size);
         PagingResponse pagingResponse = PagingResponse.builder()
                 .currentPage(page)
