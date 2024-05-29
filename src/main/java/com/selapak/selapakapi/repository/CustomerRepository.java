@@ -11,5 +11,8 @@ import com.selapak.selapakapi.model.entity.Customer;
 public interface CustomerRepository extends JpaRepository<Customer, String> {
 
     Optional<Customer> findByEmail(String email);
+    Optional<Customer> findByPhoneNumber(String phone);
+
+    Optional<Customer> findByNik(String nik);
     
 }

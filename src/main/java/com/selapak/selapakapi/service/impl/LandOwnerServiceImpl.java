@@ -1,6 +1,8 @@
 package com.selapak.selapakapi.service.impl;
 
 import com.selapak.selapakapi.exception.ApplicationException;
+import com.selapak.selapakapi.model.entity.Customer;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -16,6 +18,7 @@ import com.selapak.selapakapi.service.LandOwnerService;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -50,21 +53,62 @@ public class LandOwnerServiceImpl implements LandOwnerService {
 
     @Override
     public LandOwnerResponse create(LandOwnerRequest request) {
-        LandOwner landOwner = LandOwner.builder()
-                .name(request.getName())
-                .email(request.getEmail())
-                .phoneNumber(request.getPhoneNumber())
-                .nik(request.getNik())
-                .isActive(true)
-                .build();
-        landOwnerRepository.save(landOwner);
+        try{
 
-        return convertToLandOwnerResponse(landOwner);
+            Optional<LandOwner> checkEmail = landOwnerRepository.findByEmail(request.getEmail());
+            Optional<LandOwner> checkNomorHandphone = landOwnerRepository.findByPhoneNumber(request.getPhoneNumber());
+            Optional<LandOwner> checkNik = landOwnerRepository.findByNik(request.getNik());
+
+            if(checkNik.isPresent()){
+                throw new DataIntegrityViolationException("NIK sudah terdaftar");
+            }
+
+            if(checkNomorHandphone.isPresent()){
+                throw new DataIntegrityViolationException("Nomor hp sudah terdaftar");
+            }
+
+            if(checkEmail.isPresent()){
+                throw new DataIntegrityViolationException("Email sudah terdaftar");
+            }
+
+            LandOwner landOwner = LandOwner.builder()
+                    .name(request.getName())
+                    .email(request.getEmail())
+                    .phoneNumber(request.getPhoneNumber())
+                    .nik(request.getNik())
+                    .isActive(true)
+                    .build();
+            landOwnerRepository.save(landOwner);
+
+            return convertToLandOwnerResponse(landOwner);
+        }catch(DataIntegrityViolationException e){
+            throw new ApplicationException("Data request conflict", e.getMessage(), HttpStatus.CONFLICT);
+        }
     }
 
     @Override
     public LandOwnerResponse updateById(String id, LandOwnerRequest request) {
         LandOwner existingLandOwner = getById(id);
+
+        Optional<LandOwner> checkEmail = landOwnerRepository.findByEmail(request.getEmail());
+        Optional<LandOwner> checkNomorHandphone = landOwnerRepository.findByPhoneNumber(request.getPhoneNumber());
+        Optional<LandOwner> checkNik = landOwnerRepository.findByNik(request.getNik());
+
+        if(checkNik.isPresent() && !existingLandOwner.getNik().equals(request.getNik()) && checkNomorHandphone.isPresent() && !existingLandOwner.getPhoneNumber().equals(request.getPhoneNumber()) && checkEmail.isPresent() && !existingLandOwner.getEmail().equals(request.getEmail())){
+            throw new DataIntegrityViolationException("Email, NIK, dan Nomor hp sudah terdaftar");
+        }
+
+        if(checkNik.isPresent() && !existingLandOwner.getNik().equals(request.getNik())){
+            throw new DataIntegrityViolationException("NIK sudah terdaftar");
+        }
+
+        if(checkNomorHandphone.isPresent() && !existingLandOwner.getPhoneNumber().equals(request.getPhoneNumber())){
+            throw new DataIntegrityViolationException("Nomor hp sudah terdaftar");
+        }
+
+        if(checkEmail.isPresent() && !existingLandOwner.getEmail().equals(request.getEmail())){
+            throw new DataIntegrityViolationException("Email sudah terdaftar");
+        }
 
         existingLandOwner = existingLandOwner.toBuilder()
                 .id(existingLandOwner.getId())

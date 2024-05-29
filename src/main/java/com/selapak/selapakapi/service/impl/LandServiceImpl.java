@@ -152,6 +152,7 @@ public class LandServiceImpl implements LandService {
         List<Land> lands = landRepository.findAll(availabilitySpec);
 
         return lands.stream()
+                .filter(Land::getIsActive)
                 .map(this::convertToLandResponse)
                 .toList();
     }

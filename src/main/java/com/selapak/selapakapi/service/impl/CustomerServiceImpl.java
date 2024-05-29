@@ -2,8 +2,10 @@ package com.selapak.selapakapi.service.impl;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 import com.selapak.selapakapi.exception.ApplicationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -62,20 +64,38 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public CustomerResponse updateById(String id, CustomerUpdateRequest request) {
-        Customer existingCustomer = getById(id);
+        try{
+            Customer existingCustomer = getById(id);
+            Optional<Customer> checkNomorHandphone = customerRepository.findByPhoneNumber(request.getPhoneNumber());
+            Optional<Customer> checkNik = customerRepository.findByNik(request.getNik());
 
-        existingCustomer = existingCustomer.toBuilder()
-                .id(existingCustomer.getId())
-                .fullName(request.getFullName())
-                .phoneNumber(request.getPhoneNumber())
-                .gender(request.getGender())
-                .nik(request.getNik())
-                .address(request.getAddress())
-                .updatedAt(Instant.now().toEpochMilli())
-                .build();
-        customerRepository.save(existingCustomer);
+            if(checkNik.isPresent() && !existingCustomer.getNik().equals(request.getNik()) && checkNomorHandphone.isPresent() && !existingCustomer.getPhoneNumber().equals(request.getPhoneNumber())){
+                throw new DataIntegrityViolationException("Nomor hp dan NIK hp sudah terdaftar");
+            }
 
-        return convertToCustomerResponse(existingCustomer);
+            if(checkNomorHandphone.isPresent() && !existingCustomer.getPhoneNumber().equals(request.getPhoneNumber())){
+                throw new DataIntegrityViolationException("Nomor hp sudah terdaftar");
+            }
+
+            if(checkNik.isPresent() && !existingCustomer.getNik().equals(request.getNik())){
+                throw new DataIntegrityViolationException("NIK sudah terdaftar");
+            }
+
+            existingCustomer = existingCustomer.toBuilder()
+                    .id(existingCustomer.getId())
+                    .fullName(request.getFullName())
+                    .phoneNumber(request.getPhoneNumber())
+                    .gender(request.getGender())
+                    .nik(request.getNik())
+                    .address(request.getAddress())
+                    .updatedAt(Instant.now().toEpochMilli())
+                    .build();
+            customerRepository.save(existingCustomer);
+
+            return convertToCustomerResponse(existingCustomer);
+        }catch (DataIntegrityViolationException e){
+            throw new ApplicationException("Data request conflict", e.getMessage(), HttpStatus.CONFLICT);
+        }
     }
 
     @Override

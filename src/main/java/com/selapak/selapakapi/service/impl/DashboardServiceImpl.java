@@ -37,7 +37,7 @@ public class DashboardServiceImpl implements DashboardService {
         List<LandOwner> landOwners = landOwnerService.getAll();
         List<Land> lands = landService.getAll();
         List<Land> landsAvailable = lands.stream()
-                .filter(land -> land.getSlotAvailable() > 0)
+                .filter(land -> land.getIsActive() && land.getSlotAvailable() > 0)
                 .toList();
         List<Customer> customers = customerService.getAll();
         Map<Customer, List<Transaction>> business = transactions.stream()
