@@ -1,13 +1,17 @@
 package com.selapak.selapakapi.service.impl;
 
+import java.time.Duration;
 import java.time.Instant;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import com.selapak.selapakapi.exception.ApplicationException;
 import com.selapak.selapakapi.model.entity.*;
 import com.selapak.selapakapi.model.request.LandRequest;
+import com.selapak.selapakapi.model.response.*;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -19,14 +23,6 @@ import com.selapak.selapakapi.constant.Verify;
 import com.selapak.selapakapi.exception.TransactionNotFoundException;
 import com.selapak.selapakapi.model.request.TransactionRequest;
 import com.selapak.selapakapi.model.request.TransactionVerifyRequest;
-import com.selapak.selapakapi.model.response.AdminResponse;
-import com.selapak.selapakapi.model.response.BusinessResponse;
-import com.selapak.selapakapi.model.response.CustomerResponse;
-import com.selapak.selapakapi.model.response.LandLessResponse;
-import com.selapak.selapakapi.model.response.LandOwnerResponse;
-import com.selapak.selapakapi.model.response.LandPriceResponse;
-import com.selapak.selapakapi.model.response.RentPeriodResponse;
-import com.selapak.selapakapi.model.response.TransactionResponse;
 import com.selapak.selapakapi.repository.TransactionRepository;
 import com.selapak.selapakapi.service.AdminService;
 import com.selapak.selapakapi.service.BusinessService;
@@ -115,23 +111,27 @@ public class TransactionServiceImpl implements TransactionService {
     public Page<TransactionResponse> getAllWithDto(Integer page, Integer size) {
         Page<Transaction> transactions = transactionRepository.findAll(PageRequest.of(page, size));
 
-        return transactions.map(this::convertToTransactionResponse);
+        List<TransactionResponse> transactionResponses = transactions.getContent().stream()
+                .map(this::convertToTransactionResponse)
+                .sorted(Comparator.comparing(TransactionResponse::getUpdatedAt).reversed())
+                .toList();
+
+        return new PageImpl<>(transactionResponses, transactions.getPageable(), transactions.getTotalElements());
     }
 
     @Override
     public List<Transaction> getAll() {
-        List<Transaction> transactions = transactionRepository.findAll();
-        return transactions;
+        return transactionRepository.findAll();
     }
 
     @Override
     public List<TransactionResponse> getAllByCustomerId(String customerId) {
-        List<Transaction> transactions = transactionRepository.findAll();
-        List<TransactionResponse> transactionResponses = transactions.stream()
+        List<Transaction> transactions = getAll();
+        return transactions.stream()
                 .filter(transaction -> transaction.getCustomer().getId().equals(customerId))
+                .sorted(Comparator.comparing(Transaction::getUpdatedAt).reversed())
                 .map(this::convertToTransactionResponse)
                 .collect(Collectors.toList());
-        return transactionResponses;
     }
 
     @Override
@@ -234,8 +234,19 @@ public class TransactionServiceImpl implements TransactionService {
             throw new ApplicationException("Data payment request conflict", "Customer harus menyetujui untuk melanjutkan transaksi", HttpStatus.CONFLICT);
         }
 
-        transaction.setPaymentStatus(Payment.PAID);
-        transaction.setTransactionStatus(TrxStatus.DONE);
+        if(transaction.getPaymentStatus().equals(Payment.UNPAID)){
+            Instant currentTime = Instant.now();
+            Instant oneDayAgo = currentTime.minus(Duration.ofSeconds(86400));
+            Instant transactionTime = Instant.ofEpochMilli(transaction.getUpdatedAt());
+
+            if(transactionTime.isBefore(oneDayAgo)){
+                transaction.setTransactionStatus(TrxStatus.FAILED);
+            }else{
+                transaction.setPaymentStatus(Payment.PAID);
+                transaction.setTransactionStatus(TrxStatus.DONE);
+            }
+        }
+
         transaction.setUpdatedAt(Instant.now().toEpochMilli());
         transactionRepository.saveAndFlush(transaction);
 
@@ -294,6 +305,12 @@ public class TransactionServiceImpl implements TransactionService {
                 .slotAvailable(landPrice.getLand().getSlotAvailable())
                 .totalSlot(landPrice.getLand().getTotalSlot())
                 .isActive(landPrice.getLand().getIsActive())
+                .landPhotos(landPrice.getLand().getLandPhotos().stream()
+                        .map(landPhoto -> LandPhotoResponse.builder()
+                                .id(landPhoto.getId())
+                                .imageURL(landPhoto.getImageURL())
+                                .isActive(landPhoto.getIsActive())
+                                .build()).toList())
                 .build();
         LandPriceResponse landPriceResponse = LandPriceResponse.builder()
                 .id(landPrice.getId())
@@ -311,9 +328,12 @@ public class TransactionServiceImpl implements TransactionService {
                 .isActive(business.getIsActive())
                 .build();
 
+        Long payment = transaction.getQuantity() * transaction.getLandPrice().getPrice();
+
         return TransactionResponse.builder()
                 .id(transaction.getId())
                 .quantity(transaction.getQuantity())
+                .totalPayment(payment)
                 .verifyBy(adminResponse)
                 .verifyStatus(transaction.getVerifyStatus().toString())
                 .isSurveyed(transaction.getIsSurveyed())

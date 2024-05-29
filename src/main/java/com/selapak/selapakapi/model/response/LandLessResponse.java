@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -22,5 +24,6 @@ public class LandLessResponse {
     private Integer slotAvailable;
     private Integer totalSlot;
     private Boolean isActive;
+    private List<LandPhotoResponse> landPhotos;
     
 }
