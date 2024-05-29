@@ -76,9 +76,14 @@ public class LandServiceImpl implements LandService {
         }
         land.getLandPrices().add(landPrice);
 
-        List<BusinessType> businessTypes = landRequest.getBusinessTypes().stream()
-                .map(businessTypesRequest -> businessTypeService.getById(businessTypesRequest.getBusinessTypeId()))
-                .toList();
+        List<BusinessType> businessTypes = new ArrayList<>();
+        if(landRequest.getBusinessTypes() != null){
+             businessTypes = landRequest.getBusinessTypes().stream()
+                    .map(businessTypesRequest -> businessTypeService.getById(businessTypesRequest.getBusinessTypeId()))
+                    .toList();
+        }else{
+            throw new ApplicationException("Data bad request", "Data tipe bisnis tidak boleh kosong", HttpStatus.BAD_REQUEST);
+        }
 
         List<BusinessRecomendation> businessTypesRecomendation = businessTypes.stream()
                 .map(businessType -> BusinessRecomendation.builder()
@@ -88,8 +93,10 @@ public class LandServiceImpl implements LandService {
                 .collect(Collectors.toList());
 
         List<LandPhotoResponse> photoResponses = new ArrayList<>();
-        if(!landRequest.getLandPhotos().isEmpty()){
+        if(landRequest.getLandPhotos() != null){
            photoResponses = landPhotoService.create(land, landRequest);
+        }else{
+            throw new ApplicationException("Data bad request", "Foto land tidak boleh kosong", HttpStatus.BAD_REQUEST);
         }
 
         land.setBusinessRecomendations(businessTypesRecomendation);
