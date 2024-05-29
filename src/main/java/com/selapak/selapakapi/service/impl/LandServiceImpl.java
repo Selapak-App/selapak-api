@@ -93,7 +93,7 @@ public class LandServiceImpl implements LandService {
                 .collect(Collectors.toList());
 
         List<LandPhotoResponse> photoResponses = new ArrayList<>();
-        if(landRequest.getLandPhotos() != null){
+        if(landRequest.getLandPhotos() != null && !landRequest.getLandPhotos().isEmpty()){
            photoResponses = landPhotoService.create(land, landRequest);
         }else{
             throw new ApplicationException("Data bad request", "Foto land tidak boleh kosong", HttpStatus.BAD_REQUEST);

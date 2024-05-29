@@ -36,6 +36,11 @@ public class LandPhotoServiceImpl implements LandPhotoService {
 
         List<LandPhotoResponse> landPhotoList = new ArrayList<>();
         for(MultipartFile file : landPhotoRequest.getLandPhotos()){
+
+            if(file.isEmpty()){
+                throw new ApplicationException("Data bad request", "Foto land tidak boleh kosong", HttpStatus.BAD_REQUEST);
+            }
+
             String imageURL = uploadImageService.uploadImageLand(file);
             LandPhoto landPhoto = LandPhoto.builder()
                     .land(landId)
@@ -49,10 +54,6 @@ public class LandPhotoServiceImpl implements LandPhotoService {
                     .imageURL(landPhoto.getImageURL())
                     .isActive(landPhoto.getIsActive())
                     .build());
-        }
-
-        if(landPhotoList.isEmpty()){
-            throw new ApplicationException("Data land photo request conflict", "Foto Tidak Dapat Disimpan", HttpStatus.CONFLICT);
         }
 
         return landPhotoList;
