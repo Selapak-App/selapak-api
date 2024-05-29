@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,6 +29,7 @@ public class BusinessTypeController {
     private final BusinessTypeService businessTypeService;
 
     @PostMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPER_ADMIN')")
     public ResponseEntity<?> createBusinessType(@Valid @RequestBody BusinessTypeRequest request) {
         BusinessType businessTypeResponse = businessTypeService.createWithDto(request);
         CommonResponse<BusinessType> response = CommonResponse.<BusinessType>builder()
@@ -52,6 +54,7 @@ public class BusinessTypeController {
     }
 
     @GetMapping(AppPath.GET_BY_ID)
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPER_ADMIN')")
     public ResponseEntity<?> getBusinessTypeById(@PathVariable String id) {
         BusinessType businessType = businessTypeService.getById(id);
         CommonResponse<BusinessType> response = CommonResponse.<BusinessType>builder()

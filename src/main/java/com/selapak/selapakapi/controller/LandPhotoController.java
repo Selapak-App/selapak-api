@@ -8,6 +8,7 @@ import com.selapak.selapakapi.service.LandPhotoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.List;
 public class LandPhotoController {
     private final LandPhotoService landPhotoService;
     @PostMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPER_ADMIN')")
     public ResponseEntity<?> addPhoto(@ModelAttribute LandPhotoRequest landPhotoRequest) {
         List<LandPhotoResponse> landPhotoResponses = landPhotoService.addPhoto(landPhotoRequest);
         CommonResponse<List<LandPhotoResponse>> response = CommonResponse.<List<LandPhotoResponse>>builder()

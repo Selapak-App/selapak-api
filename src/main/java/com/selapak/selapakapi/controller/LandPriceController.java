@@ -3,6 +3,7 @@ package com.selapak.selapakapi.controller;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,6 +34,7 @@ public class LandPriceController {
     private final LandPriceService landPriceService;
 
     @GetMapping(AppPath.GET_BY_ID)
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPER_ADMIN')")
     public ResponseEntity<?> getLandPriceById(@PathVariable String id) {
         LandPrice landPrice = landPriceService.getById(id);
         CommonResponse<LandPrice> response = CommonResponse.<LandPrice>builder()
@@ -45,6 +47,7 @@ public class LandPriceController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPER_ADMIN')")
     public ResponseEntity<?> createLandPrice(@Valid @RequestBody LandPriceRequest request) {
         LandPriceResponse landPrice = landPriceService.createWithDto(request);
         CommonResponse<LandPriceResponse> response = CommonResponse.<LandPriceResponse>builder()
@@ -57,6 +60,7 @@ public class LandPriceController {
     }
 
     @PutMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPER_ADMIN')")
     public ResponseEntity<?> updateLandPriceById(@Valid @RequestBody LandPriceUpdateRequest request) {
         LandPriceResponse landPrice = landPriceService.updateById(request);
         CommonResponse<LandPriceResponse> response = CommonResponse.<LandPriceResponse>builder()
@@ -69,6 +73,7 @@ public class LandPriceController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPER_ADMIN')")
     public ResponseEntity<?> getAllLandPrices(@RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "10") Integer size) {
         Page<LandPriceResponse> landPriceResponses = landPriceService.getAll(page - 1, size);
