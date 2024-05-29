@@ -27,13 +27,9 @@ public class SecurityConfiguration {
 
     private final AuthTokenFilter authTokenFilter;
     private static final String[] WHITE_LIST_URL = {
-        "/register",
-        "/login",
-        "/admin/register",
-        "/admin/login",
-        "/super-admin/**",
         "/swagger-ui/**",
-        "/v3/api-docs/**"
+        "/v3/api-docs/**",
+        "/api/auth/**"
     };
 
     @Bean
