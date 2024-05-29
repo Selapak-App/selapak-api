@@ -3,6 +3,7 @@ package com.selapak.selapakapi.controller;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,6 +32,7 @@ public class CustomerController {
     private final CustomerService customerService;
 
     @GetMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPER_ADMIN')")
     public ResponseEntity<?> getAllCustomers(@RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "10") Integer size) {
         Page<CustomerResponse> customerResponses = customerService.getAllWithDto(page - 1, size);
@@ -74,6 +76,7 @@ public class CustomerController {
     }
 
     @DeleteMapping(AppPath.DELETE_BY_ID)
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPER_ADMIN')")
     public ResponseEntity<?> deleteCustomerById(@PathVariable String id) {
         customerService.deleteById(id);
         CommonResponse<CustomerResponse> response = CommonResponse.<CustomerResponse>builder()

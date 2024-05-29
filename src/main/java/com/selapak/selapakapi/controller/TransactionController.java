@@ -3,6 +3,7 @@ package com.selapak.selapakapi.controller;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -46,6 +47,7 @@ public class TransactionController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPER_ADMIN')")
     public ResponseEntity<?> getAllTransactions(@RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "10") Integer size) {
         Page<TransactionResponse> transactionResponses = transactionService.getAllWithDto(page - 1, size);
@@ -77,6 +79,7 @@ public class TransactionController {
     }
 
     @DeleteMapping(AppPath.DELETE_BY_ID)
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPER_ADMIN')")
     public ResponseEntity<?> deleteTransactionById(@PathVariable String id) {
         transactionService.deleteById(id);
         CommonResponse<TransactionResponse> response = CommonResponse.<TransactionResponse>builder()
@@ -88,6 +91,7 @@ public class TransactionController {
     }
 
     @PutMapping(AppPath.TRANSACTION_APPROVE)
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> approveTransaction(@PathVariable String transactionId, @RequestBody TransactionVerifyRequest request) {
         TransactionResponse transactionResponse = transactionService.verifyApproveTransaction(transactionId, request);
         CommonResponse<TransactionResponse> response = CommonResponse.<TransactionResponse>builder()
@@ -100,6 +104,7 @@ public class TransactionController {
     }
 
     @PutMapping(AppPath.TRANSACTION_REJECT)
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> rejectTransaction(@PathVariable String transactionId, @RequestBody TransactionVerifyRequest request) {
         TransactionResponse transactionResponse = transactionService.verifyRejectTransaction(transactionId, request);
         CommonResponse<TransactionResponse> response = CommonResponse.<TransactionResponse>builder()
@@ -112,6 +117,7 @@ public class TransactionController {
     }
 
     @PutMapping(AppPath.TRANSACTION_SURVEY)
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> surveyTransaction(@PathVariable String transactionId) {
         transactionService.doneSurveyLandTransaction(transactionId);
         CommonResponse<TransactionResponse> response = CommonResponse.<TransactionResponse>builder()
@@ -147,6 +153,7 @@ public class TransactionController {
     }
 
     @PutMapping(AppPath.TRANSACTION_PAY)
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> payTransaction(@PathVariable String transactionId) {
         TransactionResponse transactionResponse = transactionService.payTransaction(transactionId);
         CommonResponse<TransactionResponse> response = CommonResponse.<TransactionResponse>builder()

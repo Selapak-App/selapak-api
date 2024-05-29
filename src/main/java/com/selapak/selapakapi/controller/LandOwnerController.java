@@ -3,6 +3,7 @@ package com.selapak.selapakapi.controller;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,6 +33,7 @@ public class LandOwnerController {
     private final LandOwnerService landOwnerService;
 
     @PostMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPER_ADMIN')")
     public ResponseEntity<?> createLandOwner(@Valid @RequestBody LandOwnerRequest request) {
         LandOwnerResponse landOwnerResponse = landOwnerService.create(request);
         CommonResponse<LandOwnerResponse> response = CommonResponse.<LandOwnerResponse>builder()
@@ -44,6 +46,7 @@ public class LandOwnerController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPER_ADMIN')")
     public ResponseEntity<?> getAllLandOwners(@RequestParam(defaultValue = "1") Integer page, 
             @RequestParam(defaultValue = "10") Integer size) {
         Page<LandOwnerResponse> landOwnerResponses = landOwnerService.getAllWithDto(page - 1, size);
@@ -63,6 +66,7 @@ public class LandOwnerController {
     }
 
     @GetMapping(AppPath.GET_BY_ID)
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPER_ADMIN')")
     public ResponseEntity<?> getLandOwnerById(@PathVariable String id) {
         LandOwnerResponse landOwnerResponse = landOwnerService.getByIdWithDto(id);
         CommonResponse<LandOwnerResponse> response = CommonResponse.<LandOwnerResponse>builder()
@@ -75,6 +79,7 @@ public class LandOwnerController {
     }
 
     @PutMapping(AppPath.UPDATE_BY_ID)
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPER_ADMIN')")
     public ResponseEntity<?> updateLandOwnerById(@PathVariable String id, @Valid @RequestBody LandOwnerRequest request) {
         LandOwnerResponse landOwnerResponse = landOwnerService.updateById(id, request);
         CommonResponse<LandOwnerResponse> response = CommonResponse.<LandOwnerResponse>builder()
@@ -87,6 +92,7 @@ public class LandOwnerController {
     }
 
     @DeleteMapping(AppPath.DELETE_BY_ID)
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPER_ADMIN')")
     public ResponseEntity<?> deleteLandOwnerById(@PathVariable String id) {
         landOwnerService.deleteById(id);
         CommonResponse<LandOwnerResponse> response = CommonResponse.<LandOwnerResponse>builder()
