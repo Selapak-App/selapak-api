@@ -220,6 +220,10 @@ public class LandServiceImpl implements LandService {
     @Override
     public void deleteById(String id) {
         Land land = getById(id);
+        List<LandPrice> landPrices = land.getLandPrices();
+        for (LandPrice landPrice : landPrices) {
+            landPriceService.deleteById(landPrice.getId());
+        }
         land.setIsActive(false);
         landRepository.saveAndFlush(land);
     }
